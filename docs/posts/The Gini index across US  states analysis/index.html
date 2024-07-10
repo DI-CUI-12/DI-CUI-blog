@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.475">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Di Cui">
+<meta name="dcterms.date" content="2023-09-01">
+
+<title>blog - The Gini index across US states analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script src="../../site_libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<link href="../../site_libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
+<script src="../../site_libs/datatables-binding-0.28/datatables.js"></script>
+<script src="../../site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<link href="../../site_libs/dt-core-1.13.4/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="../../site_libs/dt-core-1.13.4/css/jquery.dataTables.extra.css" rel="stylesheet">
+<script src="../../site_libs/dt-core-1.13.4/js/jquery.dataTables.min.js"></script>
+<link href="../../site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet">
+<script src="../../site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="gini.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">blog</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html">
+ <span class="menu-text">Di Cui</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/DI-CUI"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">The Gini index across US states analysis</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">High Dimensional Data Analysis</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Di Cui </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">September 1, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#data-description-and-wrangling" id="toc-data-description-and-wrangling" class="nav-link" data-scroll-target="#data-description-and-wrangling">Data description and wrangling</a>
+  <ul class="collapse">
+  <li><a href="#datasets-overview" id="toc-datasets-overview" class="nav-link" data-scroll-target="#datasets-overview">Datasets Overview</a></li>
+  <li><a href="#data-cleaning-and-imputation" id="toc-data-cleaning-and-imputation" class="nav-link" data-scroll-target="#data-cleaning-and-imputation">Data Cleaning and Imputation:</a>
+  <ul class="collapse">
+  <li><a href="#knn-imputation-for-missing-value" id="toc-knn-imputation-for-missing-value" class="nav-link" data-scroll-target="#knn-imputation-for-missing-value">KNN imputation for missing value</a></li>
+  <li><a href="#mean-imputation-for-outlier" id="toc-mean-imputation-for-outlier" class="nav-link" data-scroll-target="#mean-imputation-for-outlier">Mean imputation for outlier</a></li>
+  </ul></li>
+  <li><a href="#other-data-credibility-issues" id="toc-other-data-credibility-issues" class="nav-link" data-scroll-target="#other-data-credibility-issues">Other data credibility issues</a></li>
+  </ul></li>
+  <li><a href="#exploratory-analysis-and-visulaization" id="toc-exploratory-analysis-and-visulaization" class="nav-link" data-scroll-target="#exploratory-analysis-and-visulaization">Exploratory analysis and visulaization</a></li>
+  <li><a href="#assupmtion-and-methodology" id="toc-assupmtion-and-methodology" class="nav-link" data-scroll-target="#assupmtion-and-methodology">Assupmtion and methodology</a></li>
+  <li><a href="#multidimensional-scaling-mds-analysis" id="toc-multidimensional-scaling-mds-analysis" class="nav-link" data-scroll-target="#multidimensional-scaling-mds-analysis">Multidimensional Scaling (MDS) Analysis</a>
+  <ul class="collapse">
+  <li><a href="#classic-mds" id="toc-classic-mds" class="nav-link" data-scroll-target="#classic-mds">Classic mds</a></li>
+  <li><a href="#sammon-mapping" id="toc-sammon-mapping" class="nav-link" data-scroll-target="#sammon-mapping">Sammon Mapping</a></li>
+  </ul></li>
+  <li><a href="#principal-component-analysis-pca" id="toc-principal-component-analysis-pca" class="nav-link" data-scroll-target="#principal-component-analysis-pca">Principal Component Analysis (PCA)</a>
+  <ul class="collapse">
+  <li><a href="#great-depression-and-world-war-ii" id="toc-great-depression-and-world-war-ii" class="nav-link" data-scroll-target="#great-depression-and-world-war-ii">Great Depression and World War II</a>
+  <ul class="collapse">
+  <li><a href="#importance-of-pcspricipal-components" id="toc-importance-of-pcspricipal-components" class="nav-link" data-scroll-target="#importance-of-pcspricipal-components">Importance of PCs(pricipal components)</a></li>
+  <li><a href="#screenplot" id="toc-screenplot" class="nav-link" data-scroll-target="#screenplot">Screenplot</a></li>
+  <li><a href="#correlation-between-gini-index-and-pcs" id="toc-correlation-between-gini-index-and-pcs" class="nav-link" data-scroll-target="#correlation-between-gini-index-and-pcs">Correlation between Gini index and PCs</a></li>
+  <li><a href="#correlation-biplot" id="toc-correlation-biplot" class="nav-link" data-scroll-target="#correlation-biplot">Correlation biplot</a></li>
+  <li><a href="#distance-biplot" id="toc-distance-biplot" class="nav-link" data-scroll-target="#distance-biplot">Distance biplot</a></li>
+  </ul></li>
+  <li><a href="#global-financial-crisis" id="toc-global-financial-crisis" class="nav-link" data-scroll-target="#global-financial-crisis">Global Financial crisis</a>
+  <ul class="collapse">
+  <li><a href="#importance-of-pc" id="toc-importance-of-pc" class="nav-link" data-scroll-target="#importance-of-pc">Importance of PC</a></li>
+  <li><a href="#screenplot-1" id="toc-screenplot-1" class="nav-link" data-scroll-target="#screenplot-1">Screenplot</a></li>
+  <li><a href="#correlation-biplot-1" id="toc-correlation-biplot-1" class="nav-link" data-scroll-target="#correlation-biplot-1">Correlation biplot</a></li>
+  <li><a href="#distance-biplot-1" id="toc-distance-biplot-1" class="nav-link" data-scroll-target="#distance-biplot-1">Distance biplot</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#conclusion-and-limitation" id="toc-conclusion-and-limitation" class="nav-link" data-scroll-target="#conclusion-and-limitation">Conclusion and limitation</a></li>
+  <li><a href="#reference" id="toc-reference" class="nav-link" data-scroll-target="#reference">Reference</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>The Gini coefficient offers a quantitative lens to assess income inequality, a pressing societal concern. It scales from zero, representing complete equality, to one, denoting extreme inequality, thus encapsulating the economic disparities within a society (Adam, 2023).</p>
+<p>This report delves into the variations in the Gini index across US states. At its core, we’re interested in examining how pivotal events such as the Great Depression, World War II, and the Global Financial Crisis influenced state-level income disparities.</p>
+<p>To ensure rigorous insights, we begin with detailed data preparation and cleansing. This foundational step paves the way for insightful data visualizations, highlighting intrinsic trends and anomalies.</p>
+<p>We employ Principal Component Analysis (PCA) and Multidimensional Scaling (MDS) as our primary analytical tools, recognized for their prowess in reducing multidimenstional data. The report will also touch upon the potential constraints and issues faced throughout our investigation.”</p>
+</section>
+<section id="data-description-and-wrangling" class="level1">
+<h1>Data description and wrangling</h1>
+<section id="datasets-overview" class="level2">
+<h2 class="anchored" data-anchor-id="datasets-overview">Datasets Overview</h2>
+<p>The primary dataset for this analysis has been procured from the repository titled “U.S. State-Level Income Inequality Data”, diligently compiled by Mark W. Frank. The data repository furnished two distinct datasets for the periods: 1929 to 1945: Capturing the Gini index values across 50 U.S. states. 2007 to 2015: This dataset details the Gini index values for an expanded list of 52 U.S. states, reflecting the statehood transitions post-1959, Alaska and Hawaii became states. Given the absence of data from 1946 to 2006, and the changes in statehood, it was decided not to merge the two datasets.</p>
+</section>
+<section id="data-cleaning-and-imputation" class="level2">
+<h2 class="anchored" data-anchor-id="data-cleaning-and-imputation">Data Cleaning and Imputation:</h2>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Inequality_GD <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"Inequality_GD.csv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>            <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"...1"</span>))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>Inequality_GR <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"Inequality_GR.csv"</span>)<span class="sc">%&gt;%</span> </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>             <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"...1"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<section id="knn-imputation-for-missing-value" class="level3">
+<h3 class="anchored" data-anchor-id="knn-imputation-for-missing-value">KNN imputation for missing value</h3>
+<p>The dataset from 2007 to 2015 exhibited missing values for some states in 2010, accounting for approximately 1.5% <a href="#fig-vismiss">Figure&nbsp;1</a> of the entire dataset. To address this, we applied KNN imputation, which takes into account inter-variable relationships. This method not only preserves a more natural variability in imputed values but also offers a more sophisticated approach than mere column-wise mean imputation.</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Inequality_GR <span class="sc">%&gt;%</span> <span class="fu">vis_miss</span>(<span class="at">warn_large_data =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-vismiss" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-vismiss-1.png" class="img-fluid figure-img" style="width:120.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;1: Percentage of missing value between 2007 and 2015</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="mean-imputation-for-outlier" class="level3">
+<h3 class="anchored" data-anchor-id="mean-imputation-for-outlier">Mean imputation for outlier</h3>
+<p>From the <a href="#fig-outlier">Figure&nbsp;2</a>, an evident outlier was identified in the 1929 to 1945 dataset: Oregon’s Gini index recorded as 1000 in 1934. Considering the Gini index’s range is between 0 and 1, this is a data entry error. We employed mean imputation to address this, calculating the average from the years immediately preceding and following 1934 for Oregon.</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>Inequality_GD_long <span class="ot">&lt;-</span> Inequality_GD <span class="sc">%&gt;%</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="st">`</span><span class="at">1929</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">1945</span><span class="st">`</span>, </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"year"</span>, </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"gini index"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>Inequality_GR_long <span class="ot">&lt;-</span> Inequality_GR <span class="sc">%&gt;%</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="st">`</span><span class="at">2007</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">2015</span><span class="st">`</span>, </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"year"</span>, </span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"gini index"</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(Inequality_GD, <span class="fu">aes</span>(<span class="at">x =</span> State, <span class="at">y =</span> <span class="st">`</span><span class="at">1934</span><span class="st">`</span>)) <span class="sc">+</span> </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">"Gini Index for US States in 1934"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-outlier" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-outlier-1.png" class="img-fluid figure-img" style="width:120.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;2: The outlier of Gini index in 1934</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">##KNN imputation </span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>state_col <span class="ot">&lt;-</span> Inequality_GR<span class="sc">$</span>State</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove 'State' column for imputation</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>GR_for_imputation <span class="ot">&lt;-</span> Inequality_GR[, <span class="sc">-</span><span class="fu">which</span>(<span class="fu">names</span>(Inequality_GR) <span class="sc">==</span> <span class="st">"State"</span>)]</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>min_max_scale <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    (x <span class="sc">-</span> <span class="fu">min</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">/</span> (<span class="fu">max</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">-</span> <span class="fu">min</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>GR_normalized <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">lapply</span>(GR_for_imputation, min_max_scale))</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>GR_imputed <span class="ot">&lt;-</span> <span class="fu">knnImputation</span>(GR_normalized, <span class="at">k =</span> <span class="dv">5</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>original_mins <span class="ot">&lt;-</span> <span class="fu">apply</span>(GR_for_imputation, <span class="dv">2</span>, min, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>original_maxs <span class="ot">&lt;-</span> <span class="fu">apply</span>(GR_for_imputation, <span class="dv">2</span>, max, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>GR_rescaled <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">mapply</span>(<span class="cf">function</span>(col, min_val, max_val) {</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    col <span class="sc">*</span> (max_val <span class="sc">-</span> min_val) <span class="sc">+</span> min_val</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>}, GR_imputed, original_mins, original_maxs, <span class="at">SIMPLIFY=</span><span class="cn">FALSE</span>))</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(GR_rescaled) <span class="ot">&lt;-</span> <span class="fu">names</span>(GR_for_imputation)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>GR_rescaled<span class="sc">$</span>State <span class="ot">&lt;-</span> state_col</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>oregon_1933 <span class="ot">&lt;-</span> Inequality_GD[Inequality_GD<span class="sc">$</span>State <span class="sc">==</span> <span class="st">"Oregon"</span>, <span class="st">"1933"</span>]</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>oregon_1935 <span class="ot">&lt;-</span> Inequality_GD[Inequality_GD<span class="sc">$</span>State <span class="sc">==</span> <span class="st">"Oregon"</span>, <span class="st">"1935"</span>]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace the 1934 value with the average of 1933 and 1935 for Oregon</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>Inequality_GD[Inequality_GD<span class="sc">$</span>State <span class="sc">==</span> <span class="st">"Oregon"</span>, <span class="st">"1934"</span>] <span class="ot">&lt;-</span> </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  (oregon_1933 <span class="sc">+</span> oregon_1935) <span class="sc">/</span> <span class="dv">2</span> </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>GD_new <span class="ot">&lt;-</span>Inequality_GD</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+</section>
+<section id="other-data-credibility-issues" class="level2">
+<h2 class="anchored" data-anchor-id="other-data-credibility-issues">Other data credibility issues</h2>
+<p>We ensured data consistency and corrected spatial discrepancies for accurate results. For better visualization, adding column to provides state abbreviations, like “Los Angeles” as “LA”.</p>
+</section>
+</section>
+<section id="exploratory-analysis-and-visulaization" class="level1">
+<h1>Exploratory analysis and visulaization</h1>
+<p>From the <a href="#fig-boxplot-pre">Figure&nbsp;3</a>, between 1929 and 1945, the Gini index dropped from 0.49 to 0.40 during the early Great Depression, a result of significant stock market losses that reduced the wealth gap between the upper and middle class (Goldin &amp; Margo, 1992). The index fluctuated between 0.39 and 0.45 throughout the later Depression years and World War II, with the spread narrowing over time. This reduction in inequality can be attributed to progressive tax policies implemented to fund the war, which disproportionately taxed the wealthy (Piketty &amp; Saez, 2003).</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>GD_new_long <span class="ot">&lt;-</span> GD_new <span class="sc">%&gt;%</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="st">`</span><span class="at">1929</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">1945</span><span class="st">`</span>, </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"year"</span>, </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"gini index"</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>GD_summary <span class="ot">&lt;-</span> GD_new_long <span class="sc">%&gt;%</span> </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year) <span class="sc">%&gt;%</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="st">`</span><span class="at">mean of Gini index</span><span class="st">`</span><span class="ot">=</span> <span class="fu">round</span>(<span class="fu">mean</span>(<span class="st">`</span><span class="at">gini index</span><span class="st">`</span>),<span class="dv">5</span>) )<span class="sc">%&gt;%</span> </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">"Year"</span> <span class="ot">=</span> <span class="st">"year"</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>         <span class="st">"Mean of Gini index"</span><span class="ot">=</span> <span class="st">"mean of Gini index"</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#summary table</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(GD_summary,<span class="at">options =</span> <span class="fu">list</span>(<span class="at">pageLength =</span> <span class="dv">4</span>,</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">searching =</span> <span class="cn">FALSE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-4ee967bf4626ad5e7be2" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-4ee967bf4626ad5e7be2">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17"],["1929","1930","1931","1932","1933","1934","1935","1936","1937","1938","1939","1940","1941","1942","1943","1944","1945"],[0.49401,0.45153,0.43181,0.40839,0.41791,0.4229,0.42548,0.45266,0.43531,0.44783,0.42877,0.39173,0.40323,0.42046,0.38541,0.4138,0.44219]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Year<\/th>\n      <th>Mean of Gini index<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"searching":false,"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>GD_new_long<span class="sc">$</span>period <span class="ot">&lt;-</span> <span class="fu">case_when</span>(GD_new_long<span class="sc">$</span>year <span class="sc">&lt;</span> <span class="dv">1939</span> <span class="sc">~</span> <span class="st">"Great Depression"</span>, </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                                GD_new_long<span class="sc">$</span>year <span class="sc">&gt;=</span> <span class="dv">1939</span> <span class="sc">&amp;</span> GD_new_long<span class="sc">$</span>year <span class="sc">&lt;</span> <span class="dv">1942</span> <span class="sc">~</span><span class="st">"Great Depression&amp;World War II"</span>, </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                                <span class="cn">TRUE</span><span class="sc">~</span> <span class="st">"World War II"</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Colored Boxplot </span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(GD_new_long, <span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> <span class="st">`</span><span class="at">gini index</span><span class="st">`</span>, <span class="at">fill =</span> period)) <span class="sc">+</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Great Depression"</span> <span class="ot">=</span> <span class="st">"blue"</span>, <span class="st">"Great Depression&amp;World War II"</span> <span class="ot">=</span> <span class="st">"green"</span>, <span class="st">"World War II"</span> <span class="ot">=</span> <span class="st">"red"</span>)) <span class="sc">+</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">fill =</span> <span class="st">"Period"</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Distribution of Gini index between 1929 and 1945"</span>) <span class="sc">+</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()<span class="sc">+</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">30</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-boxplot-pre" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-boxplot-pre-1.png" class="img-fluid figure-img" style="width:120.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;3: Distribution of Gini index between 1929 and 1945</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Contrastingly, from 2007 to 2015,from the <a href="#fig-boxplot2">Figure&nbsp;4</a> the Gini index surged by over 40%, averaging around 0.6. This rise is linked to the Global Financial Crisis (GFC) causing major job losses, especially in the construction and finance sectors, and affecting primarily the middle and lower-income households. Post-GFC, the index slightly decreased in 2009 and 2010 but stabilized around 0.6 thereafter, with noticeable outliers appearing between 2012 and 2015.</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>GR_rescale_long <span class="ot">&lt;-</span> GR_rescaled <span class="sc">%&gt;%</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="st">`</span><span class="at">2007</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">2015</span><span class="st">`</span>, </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"year"</span>, </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"gini index"</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>GR_summary <span class="ot">&lt;-</span> GR_rescale_long <span class="sc">%&gt;%</span> </span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year) <span class="sc">%&gt;%</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="st">`</span><span class="at">mean of Gini index</span><span class="st">`</span><span class="ot">=</span> <span class="fu">round</span>(<span class="fu">mean</span>(<span class="st">`</span><span class="at">gini index</span><span class="st">`</span>),<span class="dv">5</span>) )<span class="sc">%&gt;%</span> </span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">"Year"</span> <span class="ot">=</span> <span class="st">"year"</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>         <span class="st">"Mean of Gini index"</span> <span class="ot">=</span> <span class="st">"mean of Gini index"</span>) </span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#summary table</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(GR_summary,<span class="at">options =</span> <span class="fu">list</span>(<span class="at">pageLength =</span> <span class="dv">4</span>,</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">searching =</span> <span class="cn">FALSE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-bb57e83c3b5bfd9c988e" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-bb57e83c3b5bfd9c988e">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9"],["2007","2008","2009","2010","2011","2012","2013","2014","2015"],[0.61513,0.61201,0.60512,0.60066,0.60432,0.61805,0.60507,0.60971,0.60915]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Year<\/th>\n      <th>Mean of Gini index<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"searching":false,"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Colored boxplot</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>GR_rescale_long<span class="sc">$</span>period <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(GR_rescale_long<span class="sc">$</span>year <span class="sc">&lt;</span> <span class="dv">2009</span>, <span class="st">"Global Financial Crisis"</span>, <span class="st">"After Financial Crisis"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Boxplot</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(GR_rescale_long, <span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> <span class="st">`</span><span class="at">gini index</span><span class="st">`</span>, <span class="at">fill =</span> period)) <span class="sc">+</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"After Financial Crisis"</span> <span class="ot">=</span> <span class="st">"blue"</span>, <span class="st">"Global Financial Crisis"</span> <span class="ot">=</span> <span class="st">"red"</span>)) <span class="sc">+</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">fill =</span> <span class="st">"Period"</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Distribution of Gini index between 2007 and 2015"</span>) <span class="sc">+</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-boxplot2" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-boxplot2-1.png" class="img-fluid figure-img" style="width:120.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;4: Distribution of Gini index between 2007 and 2015</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="assupmtion-and-methodology" class="level1">
+<h1>Assupmtion and methodology</h1>
+<p>We only consider metric variables and employ Euclidean distance, eliminating the need for standardization due to the consistent unit of measurement. This section delves into the foundations of Principal Component Analysis (PCA) and Multidimensional Scaling (MDS).</p>
+<p>PCA reduces data dimensions while retaining the utmost information, aiming to maximize variance explanation in the process. The associated assumptions include: - Linearity: Variables possess a linear relationship. - Orthogonality: Principal components are mutually uncorrelated. - Homoscedasticity: A consistent variance across all data points. - Independence: Variables operate independently.</p>
+<p>MDS visualizes data point similarities in a reduced dimensional space, with the following assumptions: - Metric: Data points distances are metric. - Data Similarity: The measures used effectively depict data relationships. - Continuity: Data reveals a continuous structure. - Linearity: A linear interrelation exists among variables.”</p>
+</section>
+<section id="multidimensional-scaling-mds-analysis" class="level1">
+<h1>Multidimensional Scaling (MDS) Analysis</h1>
+<p>In this section, we employ Multidimensional Scaling (MDS) to analyze two datasets, each containing approximately 15 variables. MDS offers an optimal representation of data in a low-dimensional space, aiding visualization of sample similarities/dissimilarities. By observing plots generated from datasets linked to specific events, we can discern the impact of these events on the data.</p>
+<section id="classic-mds" class="level2">
+<h2 class="anchored" data-anchor-id="classic-mds">Classic mds</h2>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>GD_sf <span class="ot">&lt;-</span> <span class="fu">left_join</span>(GD_new,GD_states_sf,<span class="at">by =</span> <span class="fu">c</span>(<span class="st">"State"</span> <span class="ot">=</span> <span class="st">"NAME"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>State) <span class="sc">%&gt;%</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">"State"</span> <span class="ot">=</span> <span class="st">"abb"</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>GD_sf<span class="sc">$</span>State[<span class="fu">is.na</span>(GD_sf<span class="sc">$</span>State)] <span class="ot">&lt;-</span> <span class="st">"US"</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>GR_sf <span class="ot">&lt;-</span> <span class="fu">left_join</span>(GR_rescaled,GR_states_sf,<span class="at">by =</span> <span class="fu">c</span>(<span class="st">"State"</span> <span class="ot">=</span> <span class="st">"NAME"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>State) <span class="sc">%&gt;%</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">"State"</span> <span class="ot">=</span> <span class="st">"abb"</span>)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>GR_sf<span class="sc">$</span>State[<span class="fu">is.na</span>(GR_sf<span class="sc">$</span>State)] <span class="ot">&lt;-</span> <span class="st">"US"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>mds <span class="ot">&lt;-</span> GD_new <span class="sc">%&gt;%</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dist</span>() <span class="sc">%&gt;%</span>          </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cmdscale</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(mds) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Dim.1"</span>, <span class="st">"Dim.2"</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co"># K-means clustering</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>clust <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(mds, <span class="dv">4</span>)<span class="sc">$</span>cluster <span class="sc">%&gt;%</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.factor</span>()</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>mds <span class="ot">&lt;-</span> mds <span class="sc">%&gt;%</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">groups =</span> clust,</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">state =</span> GD_sf<span class="sc">$</span>State)</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot and color by groups</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggscatter</span>(mds, <span class="at">x =</span> <span class="st">"Dim.1"</span>, <span class="at">y =</span> <span class="st">"Dim.2"</span>, </span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>          <span class="at">label =</span> <span class="st">"state"</span>,</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>          <span class="at">color =</span> <span class="st">"groups"</span>,</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>          <span class="at">palette =</span> <span class="st">"jco"</span>,</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>          <span class="at">size =</span> <span class="dv">1</span>, </span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>          <span class="at">ellipse =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>          <span class="at">ellipse.type =</span> <span class="st">"convex"</span>,</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>          <span class="at">repel =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Classical MDS 1929-1945"</span>) <span class="ot">-&gt;</span> mds1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>mds <span class="ot">&lt;-</span> GR_rescaled <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>State) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dist</span>() <span class="sc">%&gt;%</span>          </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cmdscale</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() </span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(mds) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Dim.1"</span>, <span class="st">"Dim.2"</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co"># K-means clustering</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>clust <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(mds, <span class="dv">4</span>)<span class="sc">$</span>cluster <span class="sc">%&gt;%</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.factor</span>()</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>mds <span class="ot">&lt;-</span> mds <span class="sc">%&gt;%</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">groups =</span> clust,</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">state =</span> GR_sf<span class="sc">$</span>State)</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot and color by groups</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggscatter</span>(mds, <span class="at">x =</span> <span class="st">"Dim.1"</span>, <span class="at">y =</span> <span class="st">"Dim.2"</span>, </span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>          <span class="at">label =</span> <span class="st">"state"</span>,</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>          <span class="at">color =</span> <span class="st">"groups"</span>,</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>          <span class="at">palette =</span> <span class="st">"jco"</span>,</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>          <span class="at">size =</span> <span class="dv">1</span>, </span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>          <span class="at">ellipse =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>          <span class="at">ellipse.type =</span> <span class="st">"convex"</span>,</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>          <span class="at">repel =</span> <span class="cn">TRUE</span>)<span class="sc">+</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Classical MDS 2007-2015"</span>) <span class="ot">-&gt;</span> mds2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>mds1 <span class="sc">+</span> mds2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-mds-p1" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-mds-p1-1.png" class="img-fluid figure-img" style="width:120.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;5: MDS analysis Plot</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the <a href="#fig-mds-p1">Figure&nbsp;5</a>, similarities and dissimilarities are evident based on distances between data points. For instance, in the “Classical MDS 1929-1945” plot, Delaware appears as a potential outlier. Yet, in the “Classical MDS 2007-2015”, Delaware clusters with states like West Virginia and Washington, while California and others emerge as outliers.</p>
+</section>
+<section id="sammon-mapping" class="level2">
+<h2 class="anchored" data-anchor-id="sammon-mapping">Sammon Mapping</h2>
+<p>We use another type of MDS that is called sammon mapping to see whether our conclusion still holds. Sammon mapping is not based on eigenvalue decomposition and linear mapping so that it preserves the local structure.</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># GD 2007-2015</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>sam <span class="ot">&lt;-</span> GR_rescaled <span class="sc">%&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dist</span>() <span class="sc">%&gt;%</span>          </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sammon</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initial stress        : 0.00145
+stress after  10 iters: 0.00096, magic = 0.500
+stress after  20 iters: 0.00096, magic = 0.500</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>sam<span class="sc">$</span>points <span class="sc">%&gt;%</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="ot">-&gt;</span> sam</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(sam) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Sam.1"</span>, <span class="st">"Sam.2"</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># K-means clustering</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>clust <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(sam, <span class="dv">4</span>)<span class="sc">$</span>cluster <span class="sc">%&gt;%</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.factor</span>()</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>sam <span class="ot">&lt;-</span> sam <span class="sc">%&gt;%</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">groups =</span> clust,</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">state =</span> GR_sf<span class="sc">$</span>State)</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="co"># plot</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ggscatter</span>(sam, <span class="at">x =</span> <span class="st">"Sam.1"</span>, <span class="at">y =</span> <span class="st">"Sam.2"</span>, </span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">label =</span> <span class="st">"state"</span>,</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>          <span class="at">color =</span> <span class="st">"groups"</span>,</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>          <span class="at">palette =</span> <span class="st">"jco"</span>,</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>          <span class="at">size =</span> <span class="dv">1</span>, </span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>          <span class="at">ellipse =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>          <span class="at">ellipse.type =</span> <span class="st">"convex"</span>,</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>          <span class="at">repel =</span> <span class="cn">TRUE</span>)<span class="sc">+</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"SAM 2007-2015"</span>) <span class="ot">-&gt;</span> Sam2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>Sam1 <span class="sc">+</span> Sam2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-mds-p2" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-mds-p2-1.png" class="img-fluid figure-img" style="width:120.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;6: Sammon mapping analysis Plot</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As you can see from the <a href="#fig-mds-p2">Figure&nbsp;6</a>, it has a similar pattern to classic MDS, but some states, such as North Dakota and New Mexico will be further away (not similar).</p>
+</section>
+</section>
+<section id="principal-component-analysis-pca" class="level1">
+<h1>Principal Component Analysis (PCA)</h1>
+<section id="great-depression-and-world-war-ii" class="level2">
+<h2 class="anchored" data-anchor-id="great-depression-and-world-war-ii">Great Depression and World War II</h2>
+<section id="importance-of-pcspricipal-components" class="level3">
+<h3 class="anchored" data-anchor-id="importance-of-pcspricipal-components">Importance of PCs(pricipal components)</h3>
+<p>From our analysis, PC1 accounts for 75.8% of the total variance, while PC2 contributes an additional 15.28%. Together, PC1 and PC2 capture 91.08% of the data’s overall variance. This high cumulative proportion suggests that these two components predominantly encapsulate the dataset’s information, validating our choice for dimensionality reduction.</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="do">#########PCA ######</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>GD_pca<span class="ot">&lt;-</span> GD_sf <span class="sc">%&gt;%</span> </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="st">'State'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prcomp</span>(<span class="at">scale. =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a> <span class="fu">summary</span>(GD_pca)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Importance of components:
+                         PC1    PC2     PC3     PC4     PC5     PC6     PC7
+Standard deviation     3.590 1.6116 0.78748 0.57044 0.35623 0.34949 0.29707
+Proportion of Variance 0.758 0.1528 0.03648 0.01914 0.00746 0.00718 0.00519
+Cumulative Proportion  0.758 0.9108 0.94730 0.96644 0.97391 0.98109 0.98628
+                           PC8     PC9    PC10    PC11    PC12    PC13    PC14
+Standard deviation     0.24100 0.21648 0.20062 0.17286 0.12792 0.12232 0.11231
+Proportion of Variance 0.00342 0.00276 0.00237 0.00176 0.00096 0.00088 0.00074
+Cumulative Proportion  0.98970 0.99246 0.99483 0.99658 0.99755 0.99843 0.99917
+                          PC15    PC16      PC17
+Standard deviation     0.08716 0.08092 2.665e-07
+Proportion of Variance 0.00045 0.00039 0.000e+00
+Cumulative Proportion  0.99961 1.00000 1.000e+00</code></pre>
+</div>
+</div>
+</section>
+<section id="screenplot" class="level3">
+<h3 class="anchored" data-anchor-id="screenplot">Screenplot</h3>
+<p>The <a href="#fig-screeplot-gd">Figure&nbsp;7</a> further confirms this decision, identifying PC2 as an elbow point.</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">screeplot</span>(GD_pca, <span class="at">type =</span> <span class="st">"l"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-screeplot-gd" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-screeplot-gd-1.png" class="img-fluid figure-img" style="width:120.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;7: Screeplot for PCs 1929-1945</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="correlation-between-gini-index-and-pcs" class="level3">
+<h3 class="anchored" data-anchor-id="correlation-between-gini-index-and-pcs">Correlation between Gini index and PCs</h3>
+<p>Upon analyzing the correlation between the Gini index and the principal components, we observe that a consistently negative and weak correlation with PC1 but have a tendency to become stronger. This meaning the pattern represented by PC1 is becoming more inversely related to the Gini index over time. A variable relationship with PC2: negative for 1929-1938 but turns positive for 1939-1945. Notably, 1942 and 1945 showcase a strong positive correlation, whereas 1937-1939 indicates weak or negligible correlation.</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract loadings</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>loadings <span class="ot">&lt;-</span> GD_pca<span class="sc">$</span>rotation[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]  <span class="co"># considering only PC1 and PC2</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>transposed_loadings <span class="ot">&lt;-</span> <span class="fu">t</span>(loadings)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>transposed_df1 <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(transposed_loadings [,<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>])</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(transposed_df1) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"PC1"</span>, <span class="st">"PC2"</span>)</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(transposed_df1) <span class="ot">&lt;-</span> <span class="dv">1929</span><span class="sc">:</span><span class="dv">1937</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>transposed_loadings <span class="ot">&lt;-</span> <span class="fu">t</span>(loadings)</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>transposed_df2 <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(transposed_loadings [,<span class="dv">10</span><span class="sc">:</span><span class="dv">17</span>])</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(transposed_df2) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"PC1"</span>, <span class="st">"PC2"</span>)</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(transposed_df2) <span class="ot">&lt;-</span> <span class="dv">1938</span><span class="sc">:</span><span class="dv">1945</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>transposed_df1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>          1929       1930       1931       1932       1933       1934
+PC1 -0.2349858 -0.2459327 -0.2571730 -0.2603796 -0.2616853 -0.2680236
+PC2 -0.2691690 -0.2588394 -0.1902042 -0.1824073 -0.1750844 -0.1299880
+          1935       1936        1937
+PC1 -0.2673863 -0.2687829 -0.27104249
+PC2 -0.1491159 -0.1243959 -0.08455504</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>transposed_df2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>           1938        1939       1940       1941       1942       1943
+PC1 -0.25702053 -0.26145875 -0.2445857 -0.2290794 -0.1856574 -0.1878753
+PC2 -0.01160135  0.02923975  0.1828159  0.2239589  0.3761331  0.3952901
+          1944       1945
+PC1 -0.1964641 -0.1943193
+PC2  0.4043742  0.3909881</code></pre>
+</div>
+</div>
+</section>
+<section id="correlation-biplot" class="level3">
+<h3 class="anchored" data-anchor-id="correlation-biplot">Correlation biplot</h3>
+<p>The correlation <a href="#fig-gd-biplot">Figure&nbsp;8</a> reveals that all years negatively align with PC1. Besides, Early years exhibit negative correlations with PC2, mid-years are vertical, and later years are positive. In essence, PC1 primarily reflects inequality during the early World War II years. Greater inequality during this period corresponds to higher PC1 values. And PC2 embodies inequality nuances from both the Great Depression era and the mid to late World War II years.</p>
+<p>Examining the data further, states such as CT(Connecticut), PA(Pennsylvania), and MA(Massachusetts) exhibit pronounced inequality during the Great Depression (1929-1933), impacting their overall inequality significantly. Conversely, DE(Delaware) displayed the most significant inequality during World War II (1939-1945), with FL and NY also showing heightened inequality.</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># corrolation plot</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">biplot</span>(GD_pca, <span class="at">scale =</span> <span class="dv">0</span>, <span class="at">cex =</span> <span class="fl">0.55</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-gd-biplot" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-gd-biplot-1.png" class="img-fluid figure-img" style="width:120.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;8: Correlation biplot 1929-1945</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="distance-biplot" class="level3">
+<h3 class="anchored" data-anchor-id="distance-biplot">Distance biplot</h3>
+<p>The distance <a href="#fig-gd-dis-biplot">Figure&nbsp;9</a> distinctively groups states into nearly 4 clusters.” biplot distinctively groups states into nearly 4 clusters. The closer distance between observation(States), States have more similar Gini index.</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">biplot</span>(GD_pca, <span class="at">cex =</span> <span class="fl">0.55</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-gd-dis-biplot" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-gd-dis-biplot-1.png" class="img-fluid figure-img" style="width:120.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;9: Distance biplot 1929-1945</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="global-financial-crisis" class="level2">
+<h2 class="anchored" data-anchor-id="global-financial-crisis">Global Financial crisis</h2>
+<section id="importance-of-pc" class="level3">
+<h3 class="anchored" data-anchor-id="importance-of-pc">Importance of PC</h3>
+<p>For the data spanning 2007 to 2015, we’ve selected PC1 and PC2 based on their standard deviations exceeding 1. Combined, they account for over 98% of the total variance.</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="do">#####  GR ##########</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>GR_pca<span class="ot">&lt;-</span> GR_sf <span class="sc">%&gt;%</span> </span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="st">'State'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prcomp</span>(<span class="at">scale. =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a> <span class="fu">summary</span>(GR_pca)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Importance of components:
+                          PC1    PC2     PC3     PC4     PC5     PC6     PC7
+Standard deviation     2.6788 1.3022 0.19835 0.18431 0.16314 0.11831 0.08488
+Proportion of Variance 0.7974 0.1884 0.00437 0.00377 0.00296 0.00156 0.00080
+Cumulative Proportion  0.7974 0.9858 0.99014 0.99391 0.99687 0.99842 0.99922
+                           PC8     PC9
+Standard deviation     0.07188 0.04269
+Proportion of Variance 0.00057 0.00020
+Cumulative Proportion  0.99980 1.00000</code></pre>
+</div>
+</div>
+</section>
+<section id="screenplot-1" class="level3">
+<h3 class="anchored" data-anchor-id="screenplot-1">Screenplot</h3>
+<p>The elbow rule applied to the <a href="#fig-screeplot-gr">Figure&nbsp;10</a> further supports our choice, indicating that PC2 is an appropriate selection.</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">screeplot</span>(GR_pca, <span class="at">type =</span> <span class="st">"l"</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract loadings</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>loadings <span class="ot">&lt;-</span> GR_pca<span class="sc">$</span>rotation[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]  <span class="co"># considering only PC1 and PC2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-screeplot-gr" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-screeplot-gr-1.png" class="img-fluid figure-img" style="width:120.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;10: Screeplot for PCs 2007-2015</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>transposed_loadings <span class="ot">&lt;-</span> <span class="fu">t</span>(loadings)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>transposed_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(transposed_loadings)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(transposed_df) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"PC1"</span>, <span class="st">"PC2"</span>)</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(transposed_df) <span class="ot">&lt;-</span> <span class="dv">2007</span><span class="sc">:</span><span class="dv">2015</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>transposed_df </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>          2007       2008       2009       2010       2011       2012
+PC1 -0.2335881 -0.2318800 -0.3395366 -0.3648976 -0.3580511 -0.3577311
+PC2 -0.5952369 -0.5995428 -0.3048751  0.1111107  0.1798640  0.1906366
+          2013       2014       2015
+PC1 -0.3595398 -0.3586613 -0.3593801
+PC2  0.1953757  0.1934789  0.1914368</code></pre>
+</div>
+</div>
+</section>
+<section id="correlation-biplot-1" class="level3">
+<h3 class="anchored" data-anchor-id="correlation-biplot-1">Correlation biplot</h3>
+<p>Upon examining the correlation <a href="#fig-gr-biplot">Figure&nbsp;11</a> and the associated table, several observations stand out:</p>
+<p>From 2007 to 2009, there’s a pronounced negative linear relationship between PC2 and each respective year. This is particularly evident in 2007 and 2008, where the relationship is strongly negative, and the values of PC2 are high.</p>
+<p>Between 2010 and 2015, the relationship between PC2 and the corresponding year is relatively weaker and remains negative. These years also display a comparatively lower value of PC2.</p>
+<p>Over the entire period, there’s a consistent negative linear relationship with PC1. PC1 and PC2 negativly affected by the Global Financial Crisis and this event lead to income inequality increase. In the post-Crisis, the inequality tend to decrease.</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># corrolation plot</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">biplot</span>(GR_pca, <span class="at">scale =</span> <span class="dv">0</span>, <span class="at">cex =</span> <span class="fl">0.8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-gr-biplot" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-gr-biplot-1.png" class="img-fluid figure-img" style="width:120.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;11: Correlation biplot 2007-2015</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="distance-biplot-1" class="level3">
+<h3 class="anchored" data-anchor-id="distance-biplot-1">Distance biplot</h3>
+<p>In the distance <a href="#fig-gr-dis-biplot">Figure&nbsp;12</a>, the Euclidean spacing between states like MA(Massachusetts) and NJ(New Jersey) or NV(Nevada) and CT(Connecticut) illustrates their comparative likeness or divergence. For instance, concerning the Gini index, closely spaced states likely followed similar trajectories or maintained consistent levels of income inequality over the years.</p>
+<p>Conversely, NY(New York), FL(Florida) and MS(Mississippi) lie far from most other states might have unique or unusual trends in income inequality across the years, making them outliers.</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># distance plot </span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">biplot</span>(GR_pca, <span class="at">cex =</span> <span class="fl">0.8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-gr-dis-biplot" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-gr-dis-biplot-1.png" class="img-fluid figure-img" style="width:120.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;12: Distance biplot 2007-2015</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="conclusion-and-limitation" class="level1">
+<h1>Conclusion and limitation</h1>
+<p>Our MDS and PCA analysis revealed distinct patterns in U.S. income inequality across states and time periods. Our findings reveal that Connecticut ,Pennsylvania, Massachusetts exhibits the high level of inequality in the early year of Great Depression. In the middle and later of the World War II, Florida and New York demonstrate the highest levels of inequality. However, these insights come with caveats:</p>
+<p>They simplify data interpretation by reducing dimensions, but this can result in information loss. PCA assumes linear relationships among variables, potentially missing non-linear patterns, while MDS outcomes depend on the chosen distance metric, leading to varying interpretations.</p>
+<p>Specifically, MDS shows which states have similar inequality profiles, but not necessarily identical economic drivers. PCA identifies data patterns and correlations, like those between historical events and the Gini coefficient shifts, but can’t determine causality.</p>
+<p>To draw more in-depth and accurate conclusions, these findings should be integrated with other analytical techniques or domain expertise, such as add modeling analysis.</p>
+</section>
+<section id="reference" class="level1">
+<h1>Reference</h1>
+<p>Goldin, C., &amp; Margo, R. A. (1992). The Great Compression: The Wage Structure in the United States at Mid-century. The Quarterly Journal of Economics, 107(1), 1-34.</p>
+<p>Hayes, A. (2023, May 27). Gini Index Explained and Gini Co-efficients Around the World. Investopedia. <a href="https://www.investopedia.com/terms/g/gini-index.asp" class="uri">https://www.investopedia.com/terms/g/gini-index.asp</a>.</p>
+<p>Piketty, T., &amp; Saez, E. (2003). Income Inequality in the United States, 1913-1998. Quarterly Journal of Economics, 118(1), 1-41.</p>
+<p>Pebesma, E., &amp; Bivand, R. (2023). Spatial Data Science: With Applications in R. Chapman and Hall/CRC. <a href="https://doi.org/10.1201/9780429459016" class="uri">https://doi.org/10.1201/9780429459016</a>.</p>
+<p>Pebesma, E., 2018. Simple Features for R: Standardized Support for Spatial Vector Data. The R Journal 10 (1), 439-446, <a href="https://doi.org/10.32614/RJ-2018-009" class="uri">https://doi.org/10.32614/RJ-2018-009</a>.</p>
+<p>Robinson D, Hayes A, Couch S (2023). <em>broom: Convert Statistical Objects into Tidy Tibbles</em>. R package version 1.0.4, <a href="https://CRAN.R-project.org/package=broom" class="uri">https://CRAN.R-project.org/package=broom</a>.</p>
+<p>Wickham H, Averick M, Bryan J, Chang W, McGowan LD, François R, Grolemund G, Hayes A, Henry L, Hester J, Kuhn M, Pedersen TL, Miller E, Bache SM, Müller K, Ooms J, Robinson D, Seidel DP, Spinu V, Takahashi K, Vaughan D, Wilke C, Woo K, Yutani H (2019). “Welcome to the tidyverse.”<em>Journal of Open Source Software</em>, <em>4</em>(43), 1686. doi:10.21105/joss.01686 <a href="https://doi.org/10.21105/joss.01686" class="uri">https://doi.org/10.21105/joss.01686</a>.</p>
+<p>Tierney N (2017). “visdat: Visualising Whole Data Frames.” <em>JOSS</em>, <em>2</em>(16), 355. doi:10.21105/joss.00355 <a href="https://doi.org/10.21105/joss.00355" class="uri">https://doi.org/10.21105/joss.00355</a>.</p>
+<p>H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York, 2016.</p>
+<p>Kassambara A (2023). <em>ggpubr: ‘ggplot2’ Based Publication Ready Plots</em>. R package version 0.6.0, <a href="https://CRAN.R-project.org/package=ggpubr" class="uri">https://CRAN.R-project.org/package=ggpubr</a>.</p>
+<p>Venables, W. N. &amp; Ripley, B. D. (2002) Modern Applied Statistics with S. Fourth Edition. Springer, New York.ISBN 0-387-95457-0</p>
+<p>Zeileis A, Fisher JC, Hornik K, Ihaka R, McWhite CD, Murrell P, Stauffer R, Wilke CO (2020). “colorspace: A Toolbox for Manipulating and Assessing Colors and Palettes.” <em>Journal of Statistical Software</em>, <em>96</em>(1), 1-49. doi:10.18637/jss.v096.i01 <a href="https://doi.org/10.18637/jss.v096.i01" class="uri">https://doi.org/10.18637/jss.v096.i01</a>.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
