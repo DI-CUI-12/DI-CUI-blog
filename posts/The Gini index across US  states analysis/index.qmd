@@ -1,0 +1,655 @@
+---
+title: "The Gini index across US states analysis"
+execute: 
+  warning: false
+  message: false
+  error: false
+author: "Di Cui"
+date: "2023-09-01"
+categories: [High Dimensional Data Analysis]
+image: "gini.PNG"
+format: 
+  html:
+    toc: true
+    code-fold: true
+    css: gini.css
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+                      eval = TRUE,
+                      warning = FALSE,
+                      message = FALSE,
+                      error = FALSE,
+                      tidy.opts = list(width.cutoff = 60),
+                      tidy = TRUE, 
+                      fig.align = "center",
+                      out.width = "120%")
+library(tidyverse)
+library(naniar)
+library(visdat) 
+library(colorspace)
+library(ggplot2)
+library(DMwR2)
+library(sf)
+library(tigris)
+library(patchwork)
+library(ggpubr)
+library(MASS)
+library(broom)
+library(kableExtra)
+library(knitr)
+library(maps)
+select <- dplyr::select
+
+# Set plot theme
+ggplot2::theme_set(theme_minimal())
+```
+
+
+
+# Introduction 
+
+The Gini coefficient offers a quantitative lens to assess income inequality, a pressing societal concern. It scales from zero, representing complete equality, to one, denoting extreme inequality, thus encapsulating the economic disparities within a society (Adam, 2023).
+
+This report delves into the variations in the Gini index across US states. At its core, we're interested in examining how pivotal events such as the Great Depression, World War II, and the Global Financial Crisis influenced state-level income disparities.
+
+To ensure rigorous insights, we begin with detailed data preparation and cleansing. This foundational step paves the way for insightful data visualizations, highlighting intrinsic trends and anomalies.
+
+We employ Principal Component Analysis (PCA) and Multidimensional Scaling (MDS) as our primary analytical tools, recognized for their prowess in reducing  multidimenstional data. The report will also touch upon the potential constraints and issues faced throughout our investigation."
+
+
+
+
+
+# Data description and wrangling 
+
+## Datasets Overview
+
+The primary dataset for this analysis has been procured from the repository titled "U.S. State-Level Income Inequality Data", diligently compiled by Mark W. Frank.
+The data repository furnished two distinct datasets for the periods:
+1929 to 1945: Capturing the Gini index values across 50 U.S. states.
+2007 to 2015: This dataset details the Gini index values for an expanded list of 52 U.S. states, reflecting the statehood transitions post-1959, Alaska and Hawaii became states. 
+Given the absence of data from 1946 to 2006, and the changes in statehood, it was decided not to merge the two datasets.
+
+
+## Data Cleaning and Imputation:
+
+```{r}
+Inequality_GD <- read_csv("Inequality_GD.csv") %>% 
+            select(-c("...1"))
+Inequality_GR <- read_csv("Inequality_GR.csv")%>% 
+             select(-c("...1"))
+
+```
+
+
+### KNN imputation for missing value 
+
+The dataset from 2007 to 2015 exhibited missing values for some states in 2010, accounting for approximately 1.5% @fig-vismiss of the entire dataset. To address this, we applied KNN imputation, which takes into account inter-variable relationships. This method not only preserves a more natural variability in imputed values but also offers a more sophisticated approach than mere column-wise mean imputation. 
+
+
+```{r }
+#| label: fig-vismiss
+#| fig-cap: "Percentage of missing value between 2007 and 2015"
+
+Inequality_GR %>% vis_miss(warn_large_data = FALSE)
+```
+
+
+### Mean imputation for outlier 
+
+From the @fig-outlier, an evident outlier was identified in the 1929 to 1945 dataset: Oregon's Gini index recorded as 1000 in 1934. Considering the Gini index's range is between 0 and 1, this is a data entry error. We employed mean imputation to address this, calculating the average from the years immediately preceding and following 1934 for Oregon.
+
+
+```{r outlier, fig.cap= "The outlier of Gini index in 1934"}
+#| label: fig-outlier
+
+Inequality_GD_long <- Inequality_GD %>%
+  pivot_longer(cols = `1929`:`1945`, 
+               names_to = "year", 
+               values_to = "gini index")
+
+
+Inequality_GR_long <- Inequality_GR %>%
+  pivot_longer(cols = `2007`:`2015`, 
+               names_to = "year", 
+               values_to = "gini index")
+
+ggplot(Inequality_GD, aes(x = State, y = `1934`)) + 
+    geom_point() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    ggtitle("Gini Index for US States in 1934")
+
+
+```
+
+
+```{r}
+##KNN imputation 
+state_col <- Inequality_GR$State
+
+# Remove 'State' column for imputation
+GR_for_imputation <- Inequality_GR[, -which(names(Inequality_GR) == "State")]
+
+min_max_scale <- function(x) {
+    (x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE))
+}
+
+GR_normalized <- as.data.frame(lapply(GR_for_imputation, min_max_scale))
+
+GR_imputed <- knnImputation(GR_normalized, k = 5)
+
+
+original_mins <- apply(GR_for_imputation, 2, min, na.rm = TRUE)
+original_maxs <- apply(GR_for_imputation, 2, max, na.rm = TRUE)
+
+GR_rescaled <- as.data.frame(mapply(function(col, min_val, max_val) {
+    col * (max_val - min_val) + min_val
+}, GR_imputed, original_mins, original_maxs, SIMPLIFY=FALSE))
+
+names(GR_rescaled) <- names(GR_for_imputation)
+
+GR_rescaled$State <- state_col
+
+
+```
+
+
+```{r}
+
+oregon_1933 <- Inequality_GD[Inequality_GD$State == "Oregon", "1933"]
+oregon_1935 <- Inequality_GD[Inequality_GD$State == "Oregon", "1935"]
+
+# Replace the 1934 value with the average of 1933 and 1935 for Oregon
+Inequality_GD[Inequality_GD$State == "Oregon", "1934"] <- 
+  (oregon_1933 + oregon_1935) / 2 
+
+GD_new <-Inequality_GD
+
+```
+
+## Other data credibility issues
+
+We ensured data consistency and corrected spatial discrepancies for accurate results.
+For better visualization, adding column to provides state abbreviations, like "Los Angeles" as "LA".
+
+
+
+
+
+# Exploratory analysis and visulaization 
+
+From the @fig-boxplot-pre, between 1929 and 1945, the Gini index dropped from 0.49 to 0.40 during the early Great Depression, a result of significant stock market losses that reduced the wealth gap between the upper and middle class (Goldin & Margo, 1992). The index fluctuated between 0.39 and 0.45 throughout the later Depression years and World War II, with the spread narrowing over time. This reduction in inequality can be attributed to progressive tax policies implemented to fund the war, which disproportionately taxed the wealthy (Piketty & Saez, 2003).
+
+```{r}
+
+GD_new_long <- GD_new %>% 
+  pivot_longer(cols = `1929`:`1945`, 
+               names_to = "year", 
+               values_to = "gini index")
+
+GD_summary <- GD_new_long %>% 
+  group_by(year) %>%
+  summarise(`mean of Gini index`= round(mean(`gini index`),5) )%>% 
+  rename("Year" = "year",
+         "Mean of Gini index"= "mean of Gini index")
+
+#summary table
+
+DT::datatable(GD_summary,options = list(pageLength = 4,
+                                        searching = FALSE))
+
+```
+
+```{r}
+#| label: fig-boxplot-pre
+#| fig-cap: "Distribution of Gini index between 1929 and 1945"
+
+GD_new_long$period <- case_when(GD_new_long$year < 1939 ~ "Great Depression", 
+                                GD_new_long$year >= 1939 & GD_new_long$year < 1942 ~"Great Depression&World War II", 
+                                TRUE~ "World War II")
+
+#Colored Boxplot 
+ggplot(GD_new_long, aes(x = year, y = `gini index`, fill = period)) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("Great Depression" = "blue", "Great Depression&World War II" = "green", "World War II" = "red")) +
+  labs(fill = "Period",
+       title = "Distribution of Gini index between 1929 and 1945") +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+```
+
+Contrastingly, from 2007 to 2015,from the @fig-boxplot2 the Gini index surged by over 40%, averaging around 0.6. This rise is linked to the Global Financial Crisis (GFC) causing major job losses, especially in the construction and finance sectors, and affecting primarily the middle and lower-income households. Post-GFC, the index slightly decreased in 2009 and 2010 but stabilized around 0.6 thereafter, with noticeable outliers appearing between 2012 and 2015.
+
+```{r boxplot2}
+GR_rescale_long <- GR_rescaled %>% 
+  pivot_longer(cols = `2007`:`2015`, 
+               names_to = "year", 
+               values_to = "gini index")
+
+
+GR_summary <- GR_rescale_long %>% 
+  group_by(year) %>%
+  summarise(`mean of Gini index`= round(mean(`gini index`),5) )%>% 
+  rename("Year" = "year",
+         "Mean of Gini index" = "mean of Gini index") 
+
+#summary table
+  
+DT::datatable(GR_summary,options = list(pageLength = 4,
+                                        searching = FALSE))
+```
+
+
+```{r}
+#| label: fig-boxplot2
+#| fig-cap: "Distribution of Gini index between 2007 and 2015"
+#Colored boxplot
+GR_rescale_long$period <- ifelse(GR_rescale_long$year < 2009, "Global Financial Crisis", "After Financial Crisis")
+
+# Boxplot
+ggplot(GR_rescale_long, aes(x = year, y = `gini index`, fill = period)) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("After Financial Crisis" = "blue", "Global Financial Crisis" = "red")) +
+  labs(fill = "Period",
+       title = "Distribution of Gini index between 2007 and 2015") +
+  theme_minimal()
+  
+```
+
+
+
+
+
+```{r include=FALSE}
+
+#library(stringr)
+#states_map <- map_data(map = "state")
+#states_map$region <- str_to_title(states_map$region)
+#states_map$region <- sub("^(.)", "\\U\\1", states_map$region, perl = TRUE)
+
+abb <- state.abb[-2][-10]
+abb <- append(abb, "DC", after = 7)
+
+GD_states_sf <- data.frame(abb, NAME = GD_new$State[-1])
+
+#GD_states_sf[8, "NAME"] <- "District of Columbia"
+
+#states_sf <- left_join(states_sf, states_map, by = c("NAME" = "region")) 
+
+abb <- append(state.abb, "DC", after = 8)
+GR_states_sf <- data.frame(abb, NAME = GR_rescaled$State[-1])
+
+#GR_states_sf[8, "NAME"] <- "District of Columbia"
+
+
+
+```
+
+
+
+
+# Assupmtion and methodology 
+
+We only consider metric variables and employ Euclidean distance, eliminating the need for standardization due to the consistent unit of measurement. This section delves into the foundations of Principal Component Analysis (PCA) and Multidimensional Scaling (MDS).
+
+PCA reduces data dimensions while retaining the utmost information, aiming to maximize variance explanation in the process. The associated assumptions include:
+- Linearity: Variables possess a linear relationship.
+- Orthogonality: Principal components are mutually uncorrelated.
+- Homoscedasticity: A consistent variance across all data points.
+- Independence: Variables operate independently.
+
+MDS visualizes data point similarities in a reduced dimensional space, with the following assumptions:
+- Metric: Data points distances are metric.
+- Data Similarity: The measures used effectively depict data relationships.
+- Continuity: Data reveals a continuous structure.
+- Linearity: A linear interrelation exists among variables."
+
+
+#  Multidimensional Scaling (MDS) Analysis
+
+In this section, we employ Multidimensional Scaling (MDS) to analyze two datasets, each containing approximately 15 variables. MDS offers an optimal representation of data in a low-dimensional space, aiding visualization of sample similarities/dissimilarities. By observing plots generated from datasets linked to specific events, we can discern the impact of these events on the data.
+
+## Classic mds
+
+```{r}
+GD_sf <- left_join(GD_new,GD_states_sf,by = c("State" = "NAME")) %>%
+  select(-State) %>%
+  rename("State" = "abb")
+
+GD_sf$State[is.na(GD_sf$State)] <- "US"
+
+
+GR_sf <- left_join(GR_rescaled,GR_states_sf,by = c("State" = "NAME")) %>%
+  select(-State) %>%
+  rename("State" = "abb")
+
+GR_sf$State[is.na(GR_sf$State)] <- "US"
+```
+```{r}
+mds <- GD_new %>%
+  select(-1) %>% 
+  dist() %>%          
+  cmdscale() %>%
+  as_tibble() 
+
+colnames(mds) <- c("Dim.1", "Dim.2")
+
+# K-means clustering
+clust <- kmeans(mds, 4)$cluster %>%
+  as.factor()
+mds <- mds %>%
+  mutate(groups = clust,
+         state = GD_sf$State)
+# Plot and color by groups
+ggscatter(mds, x = "Dim.1", y = "Dim.2", 
+          label = "state",
+          color = "groups",
+          palette = "jco",
+          size = 1, 
+          ellipse = TRUE,
+          ellipse.type = "convex",
+          repel = TRUE) +
+  ggtitle("Classical MDS 1929-1945") -> mds1
+```
+```{r}
+mds <- GR_rescaled %>%
+  select(-State) %>% 
+  dist() %>%          
+  cmdscale() %>%
+  as_tibble() 
+
+colnames(mds) <- c("Dim.1", "Dim.2")
+
+# K-means clustering
+clust <- kmeans(mds, 4)$cluster %>%
+  as.factor()
+mds <- mds %>%
+  mutate(groups = clust,
+         state = GR_sf$State)
+# Plot and color by groups
+ggscatter(mds, x = "Dim.1", y = "Dim.2", 
+          label = "state",
+          color = "groups",
+          palette = "jco",
+          size = 1, 
+          ellipse = TRUE,
+          ellipse.type = "convex",
+          repel = TRUE)+
+  ggtitle("Classical MDS 2007-2015") -> mds2
+
+```
+
+```{r mds-p1, fig.cap="MDS analysis Plot"}
+#| label: fig-mds-p1
+mds1 + mds2
+```
+
+From the @fig-mds-p1, similarities and dissimilarities are evident based on distances between data points. For instance, in the "Classical MDS 1929-1945" plot, Delaware appears as a potential outlier. Yet, in the "Classical MDS 2007-2015", Delaware clusters with states like West Virginia and Washington, while California and others emerge as outliers.
+
+## Sammon Mapping
+
+We use another type of MDS that is called sammon mapping to see whether our
+conclusion still holds. Sammon mapping is not based on eigenvalue decomposition and linear mapping so that it preserves the local structure.
+
+```{r include=FALSE}
+# GD 1925-1945
+sam <- GD_new %>%
+  select(-1) %>% 
+  dist() %>%          
+  sammon()
+
+sam$points %>% 
+  as_tibble() -> sam
+
+colnames(sam) <- c("Sam.1", "Sam.2")
+
+# K-means clustering
+clust <- kmeans(sam, 4)$cluster %>%
+  as.factor()
+sam <- sam %>%
+  mutate(groups = clust,
+         state = GD_sf$State)
+# plot
+ggscatter(sam, x = "Sam.1", y = "Sam.2", 
+          label = "state",
+          color = "groups",
+          palette = "jco",
+          size = 1, 
+          ellipse = TRUE,
+          ellipse.type = "convex",
+          repel = TRUE)+
+  ggtitle("SAM 1929-1945") -> Sam1
+```
+
+```{r}
+# GD 2007-2015
+sam <- GR_rescaled %>%
+  select(-1) %>% 
+  dist() %>%          
+  sammon()
+
+sam$points %>% 
+  as_tibble() -> sam
+
+colnames(sam) <- c("Sam.1", "Sam.2")
+
+# K-means clustering
+clust <- kmeans(sam, 4)$cluster %>%
+  as.factor()
+
+sam <- sam %>%
+  mutate(groups = clust,
+         state = GR_sf$State)
+# plot
+ggscatter(sam, x = "Sam.1", y = "Sam.2", 
+          label = "state",
+          color = "groups",
+          palette = "jco",
+          size = 1, 
+          ellipse = TRUE,
+          ellipse.type = "convex",
+          repel = TRUE)+
+  ggtitle("SAM 2007-2015") -> Sam2
+```
+
+```{r mds-p2, fig.cap="Sammon mapping analysis Plot"}
+#| label: fig-mds-p2 
+Sam1 + Sam2
+```
+
+As you can see from the @fig-mds-p2, it has a similar pattern to classic MDS, but some states, such as North Dakota and New Mexico will be further away (not similar).
+
+
+
+
+# Principal Component Analysis (PCA) 
+
+## Great Depression and World War II
+
+### Importance of PCs(pricipal components)
+
+From our analysis, PC1 accounts for 75.8% of the total variance, while PC2 contributes an additional 15.28%. Together, PC1 and PC2 capture 91.08% of the data's overall variance. This high cumulative proportion suggests that these two components predominantly encapsulate the dataset's information, validating our choice for dimensionality reduction.
+
+```{r}
+#########PCA ######
+GD_pca<- GD_sf %>% 
+  column_to_rownames('State') %>% 
+  prcomp(scale. = TRUE)
+
+ summary(GD_pca)
+```
+### Screenplot
+
+The @fig-screeplot-gd further confirms this decision, identifying PC2 as an elbow point. 
+
+```{r screeplot-gd, fig.cap=" Screeplot for PCs 1929-1945"}
+#| label: fig-screeplot-gd
+screeplot(GD_pca, type = "l")
+```
+### Correlation between Gini index and PCs
+
+Upon analyzing the correlation between the Gini index and the principal components, we observe that a consistently negative and weak correlation with PC1 but have a tendency to become stronger. This meaning the pattern represented by PC1 is becoming more inversely related to the Gini index over time. A variable relationship with PC2: negative for 1929-1938 but turns positive for 1939-1945. Notably, 1942 and 1945 showcase a strong positive correlation, whereas 1937-1939 indicates weak or negligible correlation.
+
+```{r}
+# Extract loadings
+loadings <- GD_pca$rotation[, 1:2]  # considering only PC1 and PC2
+
+
+transposed_loadings <- t(loadings)
+transposed_df1 <- as.data.frame(transposed_loadings [,1:9])
+rownames(transposed_df1) <- c("PC1", "PC2")
+colnames(transposed_df1) <- 1929:1937
+
+transposed_loadings <- t(loadings)
+transposed_df2 <- as.data.frame(transposed_loadings [,10:17])
+rownames(transposed_df2) <- c("PC1", "PC2")
+colnames(transposed_df2) <- 1938:1945
+
+
+transposed_df1
+transposed_df2
+
+```
+
+### Correlation biplot
+
+The correlation @fig-gd-biplot reveals that all years negatively align with PC1. Besides, Early years exhibit negative correlations with PC2, mid-years are vertical, and later years are positive.
+In essence, PC1 primarily reflects inequality during the early World War II years. Greater inequality during this period corresponds to higher PC1 values.
+And PC2 embodies inequality nuances from both the Great Depression era and the mid to late World War II years.
+
+Examining the data further, states such as CT(Connecticut), PA(Pennsylvania), and MA(Massachusetts) exhibit pronounced inequality during the Great Depression (1929-1933), impacting their overall inequality significantly. Conversely, DE(Delaware) displayed the most significant inequality during World War II (1939-1945), with FL and NY also showing heightened inequality.
+
+
+```{r gd-biplot, fig.cap="Correlation biplot 1929-1945", fig.align='center',fig.width=8, fig.height=8}
+#| label: fig-gd-biplot
+# corrolation plot
+biplot(GD_pca, scale = 0, cex = 0.55)
+```
+### Distance biplot
+
+The distance @fig-gd-dis-biplot distinctively groups states into nearly 4 clusters." biplot distinctively groups states into nearly 4 clusters. The closer distance between observation(States), States have more similar Gini index.
+
+```{r gd-dis-biplot, fig.cap="Distance biplot 1929-1945",fig.align='center', fig.width=8, fig.height=8}
+#| label: fig-gd-dis-biplot
+
+biplot(GD_pca, cex = 0.55)
+
+```
+
+## Global Financial crisis 
+
+### Importance of PC
+
+For the data spanning 2007 to 2015, we've selected PC1 and PC2 based on their standard deviations exceeding 1. Combined, they account for over 98% of the total variance.
+
+```{r}
+#####  GR ##########
+GR_pca<- GR_sf %>% 
+  column_to_rownames('State') %>% 
+  prcomp(scale. = TRUE)
+
+ summary(GR_pca)
+```
+
+
+### Screenplot
+
+The elbow rule applied to the @fig-screeplot-gr further supports our choice, indicating that PC2 is an appropriate selection. 
+
+```{r screeplot-gr, fig.cap=" Screeplot for PCs 2007-2015"}
+#| label: fig-screeplot-gr
+
+screeplot(GR_pca, type = "l")
+
+# Extract loadings
+loadings <- GR_pca$rotation[, 1:2]  # considering only PC1 and PC2
+```
+
+
+```{r}
+transposed_loadings <- t(loadings)
+transposed_df <- as.data.frame(transposed_loadings)
+rownames(transposed_df) <- c("PC1", "PC2")
+colnames(transposed_df) <- 2007:2015
+
+
+transposed_df 
+
+```
+### Correlation biplot
+
+Upon examining the correlation @fig-gr-biplot and the associated table, several observations stand out:
+
+From 2007 to 2009, there's a pronounced negative linear relationship between PC2 and each respective year. This is particularly evident in 2007 and 2008, where the relationship is strongly negative, and the values of PC2 are high. 
+
+Between 2010 and 2015, the relationship between PC2 and the corresponding year is relatively weaker and remains negative. These years also display a comparatively lower value of PC2.
+
+Over the entire period, there's a consistent negative linear relationship with PC1.
+PC1 and PC2 negativly affected by the Global Financial Crisis and this event lead to income inequality increase. In the post-Crisis, the inequality tend to decrease. 
+
+
+```{r gr-biplot, fig.cap="Correlation biplot 2007-2015", fig.width=8, fig.height=8, fig.align='center'}
+#| label: fig-gr-biplot
+# corrolation plot
+biplot(GR_pca, scale = 0, cex = 0.8)
+```
+### Distance biplot
+
+In the distance @fig-gr-dis-biplot, the Euclidean spacing between states like MA(Massachusetts) and NJ(New Jersey) or NV(Nevada) and CT(Connecticut) illustrates their comparative likeness or divergence. For instance, concerning the Gini index, closely spaced states likely followed similar trajectories or maintained consistent levels of income inequality over the years. 
+
+Conversely, NY(New York), FL(Florida) and MS(Mississippi) lie far from most other states might have unique or unusual trends in income inequality across the years, making them outliers.  
+
+
+```{r  gr-dis-biplot, fig.cap="Distance biplot 2007-2015", fig.width=8, fig.height=8, fig.align='center'}
+#| label: fig-gr-dis-biplot
+# distance plot 
+biplot(GR_pca, cex = 0.8)
+```
+
+
+
+# Conclusion and limitation 
+
+Our MDS and PCA analysis revealed distinct patterns in U.S. income inequality across states and time periods. Our findings reveal that Connecticut ,Pennsylvania, Massachusetts exhibits the high level of inequality in the early year of Great Depression. In the middle and later of the World War II, Florida and New York demonstrate the highest levels of inequality. However, these insights come with caveats:
+
+They simplify data interpretation by reducing dimensions, but this can result in information loss. PCA assumes linear relationships among variables, potentially missing non-linear patterns, while MDS outcomes depend on the chosen distance metric, leading to varying interpretations.
+
+Specifically, MDS shows which states have similar inequality profiles, but not necessarily identical economic drivers. PCA identifies data patterns and correlations, like those between historical events and the Gini coefficient shifts, but can't determine causality.
+
+To draw more in-depth and accurate conclusions, these findings should be integrated with other analytical techniques or domain expertise, such as add modeling analysis.  
+
+
+
+# Reference 
+
+Goldin, C., & Margo, R. A. (1992). The Great Compression: The Wage Structure in the United States at Mid-century. The Quarterly Journal of Economics, 107(1), 1-34.
+
+Hayes, A. (2023, May 27). Gini Index Explained and Gini Co-efficients Around the World. Investopedia. <https://www.investopedia.com/terms/g/gini-index.asp>.
+
+Piketty, T., & Saez, E. (2003). Income Inequality in the United States, 1913-1998. Quarterly Journal of Economics, 118(1), 1-41.
+
+Pebesma, E., & Bivand, R. (2023). Spatial Data Science: With Applications in R. Chapman and Hall/CRC. <https://doi.org/10.1201/9780429459016>.
+
+Pebesma, E., 2018. Simple Features for R: Standardized Support for Spatial Vector Data. The R Journal 10 (1), 439-446, <https://doi.org/10.32614/RJ-2018-009>.
+
+Robinson D, Hayes A, Couch S (2023). _broom: Convert Statistical Objects into Tidy Tibbles_. R package version 1.0.4, <https://CRAN.R-project.org/package=broom>.
+
+Wickham H, Averick M, Bryan J, Chang W, McGowan LD, François R, Grolemund G, Hayes A, Henry L, Hester J, Kuhn M, Pedersen TL, Miller E, Bache SM, Müller K, Ooms J, Robinson D, Seidel DP, Spinu V, Takahashi K, Vaughan D, Wilke C, Woo K, Yutani H (2019). “Welcome to the tidyverse.”_Journal of Open Source Software_, *4*(43), 1686. doi:10.21105/joss.01686 <https://doi.org/10.21105/joss.01686>.
+  
+Tierney N (2017). “visdat: Visualising Whole Data Frames.” _JOSS_, *2*(16), 355. doi:10.21105/joss.00355 <https://doi.org/10.21105/joss.00355>.
+
+H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York, 2016.
+
+Kassambara A (2023). _ggpubr: 'ggplot2' Based Publication Ready Plots_. R package version 0.6.0, <https://CRAN.R-project.org/package=ggpubr>.
+
+Venables, W. N. & Ripley, B. D. (2002) Modern Applied Statistics with S. Fourth Edition. Springer, New York.ISBN 0-387-95457-0
+
+
+Zeileis A, Fisher JC, Hornik K, Ihaka R, McWhite CD, Murrell P, Stauffer R, Wilke CO (2020). “colorspace: A Toolbox for Manipulating and Assessing Colors and Palettes.” _Journal of Statistical Software_, *96*(1), 1-49. doi:10.18637/jss.v096.i01 <https://doi.org/10.18637/jss.v096.i01>.
+
+

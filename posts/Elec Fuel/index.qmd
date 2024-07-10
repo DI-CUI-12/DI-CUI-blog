@@ -7,9 +7,13 @@ execute:
   error: false
 author: "Di Cui"
 date: "2022-11-25"
-categories: [Fuel]
+categories: [Exploration Data Analysis]
 image: "elec_stations.jpg"
-toc: true
+format: 
+  html:
+    toc: true
+    code-fold: true
+    css: elec_fuel.css
 editor_options: 
   chunk_output_type: console
 ---
@@ -29,7 +33,7 @@ library(leaflet)
 stations <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-03-01/stations.csv')
 ```
 
-# Introduction and motivation
+## Introduction and motivation
 
 In the advent of 21st century, automotive industry and its energy industry, particularly fuel, are increasing in popularity drastically and rapidly. However, most have rarely give significant thoughts about their sustainability of using fuel which are made from fossils, let alone its massive footprint of Carbon Dioxide and other humanly and environmentally threatening substances emerged from internal combustion engine.
   
@@ -88,7 +92,7 @@ p3
 ```
 
 
-# Data description
+## Data description
 
 The U.S. Department of Energy collects this data in partnership with Clean Cities coalitions and their stakeholders to help fleets and consumers find alternative fueling stations.[1] This data is available at <https://data-usdot.opendata.arcgis.com/datasets/usdot::alternative-fueling-stations/about>. The collection of this data is like a census, which is collected over time. 
   
@@ -110,7 +114,7 @@ kable(data_dict_trim) %>%
 ```
 
 
-# Electric stations and port number (1995-2021)
+## Electric stations and port number (1995-2021)
 
 <div>
 
@@ -133,7 +137,7 @@ Map1: Map of electric stations in US during 1995-2021
 From [Map1](#Map1), we can see the exact location and name of the electric station and the number of ports it has by zooming in on this map.
 
 
-## How does the number of electric stations change by state over year?
+### How does the number of electric stations change by state over year?
 
 ```{r Figure2, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig-cap: "Figure2: The trend of electric stations over year by state. Note: The y-axis is log transformed."
@@ -193,7 +197,7 @@ On the other extreme ends, ON and PR have just started to open electric station 
 Overall, the United States and Canadian territories are in a healthy trend of opening new alternative fuel stations with more and more encouragement and awareness toward larger group of people.
 
 
-## Does the number of electric stations have a effect on the number of ports ?
+### Does the number of electric stations have a effect on the number of ports ?
 
 ```{r Figure4, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig-cap: "Figure4: The relationship between ports and ELEC stations over year. Note: The y-axis is log transformed."
@@ -287,16 +291,18 @@ According to Hawkins, these chargers are becoming more and more accessible and t
 
 
 
-# Conclusion
+## Conclusion
   
 In conclusion, we believed that the future of electric vehicles and ports in alternative fuel stations are as bright as ever. With significant number of states are increasing in stations with charger, better EVSE ports are constantly upgrading and even motor companies are contributing in encouraging and installation, electric vehicle could be a new norm within two decades.
 
 
-# Reference
+## Reference
 
 *[1]Bureau of Transportation Statistics. <https://data-usdot.opendata.arcgis.com/datasets/usdot::alternative-fueling-stations/about>.*
 
-*[2]Alternativa Fuels Data Center. <https://afdc.energy.gov/fuels/emerging_methanol.html#:~:text=Methanol%20was%20marketed%20in%20the,vehicles%20in%20the%20United%20States>.*
+*[2]Alternativa Fuels Data Center. *
+*https://afdc.energy.gov/fuels/emerging_methanol.html#:~:text=Methanol%20was%*
+*20marketed%20in%20the,vehicles%20in%20the%20United%20States.*
 
 **Data reference**
 
@@ -304,7 +310,8 @@ In conclusion, we believed that the future of electric vehicles and ports in alt
 
 **Packages and citation reference**
 
-*Alternative Fuels Data Center: Methanol. (n.d.). Afdc.energy.gov. Retrieved August 26, 2022, from <https://afdc.energy.gov/fuels/emerging_methanol.html#:~:text=Methanol%20was%20marketed%20in%20the>.*
+*Alternative Fuels Data Center: Methanol. (n.d.). Afdc.energy.gov. Retrieved August 26, 2022, from https://afdc.energy.gov/fuels/emerging_methanol.html#:~:text=Methanol%20was%20marketed%20in%*
+*20the.*
 
 *Auguie, B (2017). gridExtra: Miscellaneous Functions for "Grid" Graphics. R package version 2.3.<https://CRAN.R-project.org/package=gridExtra>.*
 

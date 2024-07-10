@@ -2,7 +2,7 @@
 title: "Nobel Prize laureates"
 author: "Di Cui"
 date: "2022-10-16"
-categories: [Nobel]
+categories: [Communicating With Data]
 image: "Nobel_img.webp"
 execute: 
   echo: false

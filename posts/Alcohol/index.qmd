@@ -1,20 +1,22 @@
 ---
 title: "Alcohol Consumption"
 execute: 
-  echo: false
   warning: false
   message: false
   error: false
 author: "Di Cui"
 date: "2022-08-29"
-categories: [Alcohol]
+categories: [Communicating With Data]
 image: "Common_alcoholic_beverages.jpg"
-toc: true
+format: 
+  html:
+    toc: true
+    code-fold: true
 editor_options: 
   chunk_output_type: console
 ---
 
-```{r}
+```{r include=FALSE}
 library(tidyverse)
 library(gridExtra)
 library(DT)
@@ -34,7 +36,7 @@ relationship <- alcohol %>%
 
 ## Introduction
 
-Alcohol plays an important role in our life, alcohol consumption could reflect the alcoholism of the people, the culture of the country, or the economy of the country. This blog shows the global alcohol consumption and global alcohol consumption of beer, spirit and wine.
+Alcohol's role in our lives extends beyond a mere drink. It mirrors alcoholism, cultural facets, and economic dynamics. This blog delves into global alcohol consumption, spotlighting beer, spirits, and wine. These choices echo traditions, camaraderie, and refinement. Beer unites at gatherings, spirits offer mystique, and wine embodies elegance. From local pubs to international soirées, alcohol reflects diverse human experiences. This exploration unravels trends and stories, showcasing the interplay of culture and economics in our relationship with alcohol. 
 
 ![](Common_alcoholic_beverages.jpg) 
 <div>

@@ -2,9 +2,17 @@
 title: "Welcome To My Blog"
 author: "Di Cui"
 date: "2022-08-28"
-categories: [news]
+categories: [Welcome]
 ---
 
-This is the first post in a Quarto blog. Welcome!
+Greetings! I'm excited to welcome you to my blog, a platform dedicated to showcasing the outcomes of my graduate journey in the field of Business Analytics. As a passionate learner in this domain, I'm thrilled to share the fruits of my studies with you.
+
+This digital space encapsulates a collection of my endeavors, primarily focused on the realms of machine learning, exploratory data analysis, communication with data and forecasting.
+
+This blog serves as a testament to my growth as a data enthusiast. The process of transforming raw data into compelling visualizations and compelling stories has been a journey of creativity and technical acumen.
+
+Through this blog, I aim to share my insights and techniques, contributing to the broader discourse on the importance of clear and impactful data communication.
+
+Join me on this exciting journey as we unravel the power of data. Thank you for being a part of this exploration!
 
 ![](flower.jpg)
