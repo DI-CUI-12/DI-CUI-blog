@@ -1,0 +1,15 @@
+/* css styles */
+.navbar-dark, .quarto-title-banner {
+  background-color: #8856a7;
+}
+
+
+
+
+
+#reference {
+  background-color: #f0f0f0;
+  padding-left:10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+}
