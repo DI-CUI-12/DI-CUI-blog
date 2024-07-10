@@ -1,0 +1,14 @@
+{
+  "hash": "e057d467d072990dbc4917f8654b0ca0",
+  "result": {
+    "markdown": "---\ntitle: \"Alcohol Shiny App\"\nexecute: \n  echo: false\n  warning: false\n  message: false\n  error: false\nauthor: \"Di Cui\"\ndate: \"2022-08-20\"\ncategories: [Alcohol]\nimage: \"Common_alcoholic_beverages.jpg\"\ntoc: true\neditor_options: \n  chunk_output_type: console\n---\n\n::: {.cell}\n\n:::\n\n::: {.cell}\n\n:::\n\n::: {.cell}\n\n:::\n\n::: {.cell}\n::: {.cell-output-display}\n`<div style=\"width: 100% ; height: 400px ; text-align: center; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;\" class=\"muted well\">Shiny applications not supported in static R Markdown documents</div>`{=html}\n:::\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

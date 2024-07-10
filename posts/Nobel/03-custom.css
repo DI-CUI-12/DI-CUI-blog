@@ -1,0 +1,32 @@
+.quarto-title-meta {
+  background-color: #ffffff;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+
+#reference {
+  background-color: #f0f0f0;
+  padding-left:10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+}
+
+
+
+h2{
+color: #bd0026;
+}
+
+h3{
+  color: #fc4e2a;
+}
+
+
+.img-caption{
+  color: #5a6570;
+}
+
+.navbar-dark, .quarto-title-banner {
+  background-color: #8856a7;
+}

@@ -1,0 +1,292 @@
+---
+title: "Alcohol Consumption"
+execute: 
+  echo: false
+  warning: false
+  message: false
+  error: false
+author: "Di Cui"
+date: "2022-08-29"
+categories: [Alcohol]
+image: "Common_alcoholic_beverages.jpg"
+toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+library(gridExtra)
+library(DT)
+library(knitr)
+library(kableExtra)
+library(graphics)
+library(plotly)
+library(patchwork)
+
+alcohol <- read_csv(here::here("posts/Alcohol/week13_alcohol_global.csv"))
+
+relationship <- alcohol %>%
+  pivot_longer(cols = beer_servings:wine_servings,
+               names_to = "Alcohol_servings",
+               values_to = "servings")
+```
+
+## Introduction
+
+Alcohol plays an important role in our life, alcohol consumption could reflect the alcoholism of the people, the culture of the country, or the economy of the country. This blog shows the global alcohol consumption and global alcohol consumption of beer, spirit and wine.
+
+![](Common_alcoholic_beverages.jpg) 
+<div>
+<imgcaption class="img-caption">
+image source: Wikipedia
+</imgcaption>
+</div>
+
+## Data description
+
+This data shows the beer, spirit and wine consumption and total litres of pure alcohol by country. The data source is from Thomas Mock (2022). Tidy Tuesday: A weekly data project aimed at the R ecosystem <https://github.com/rfordatascience/tidytuesday>.
+
+Variables:
+
+-   **country** : global country name.
+
+-   **beer_servings** : consumption of beer.
+
+-   **spirit_servings** : consumption of spirit.
+
+-   **wine-servings** : consumption of wine.
+
+-   **total_litres_of_pure_alcohol** : the total (sum of recorded and unrecorded alcohol) amount of alcohol consumed per person (15 years of age or older) over a calendar year, in litres of pure alcohol, adjusted for tourist consumption. (The World Bank Group,2022)
+
+Click [here](https://github.com/rfordatascience/tidytuesday/blob/master/data/2018/2018-06-26/week13_alcohol_global.csv) to see or download the data.
+
+## Global alcohol consumption
+
+```{r}
+
+map <- map_data("world") 
+
+map$region <- gsub("Russia", "Russian Federation", map$region)
+
+map_data <- map %>%
+  left_join(alcohol, by = c("region"= "country")) 
+
+ p1<-ggplot(map_data, aes(x = long, y = lat, group = group, 
+                     text = sprintf("region: %s<br>total litres of pure alcohol: %s",
+                                    region, total_litres_of_pure_alcohol)))+
+ geom_polygon( aes(fill = total_litres_of_pure_alcohol), color = "white")+
+  scale_fill_gradient(low = "#f7fcfd", 
+                        high = "#4d004b",
+                      na.value = "grey",
+                      breaks = c(0,2,4,6,8,10,12,14),
+                      labels = c(0,2,4,6,8,10,12,14))+
+  theme_void()+
+  theme(panel.grid = element_blank(),
+        axis.line.x = element_blank(),
+        axis.line.y = element_blank())+
+  labs(fill = "Litres",
+       title = "Global alcohol consumption")
+```
+
+<div>
+
+<a name = 'Figure1'></a>
+
+```{r}
+
+ggplotly(p1,tooltip = "text")
+
+```
+<figcaption class= "figure-ggplot">
+Figure1: Global alcohol consumption (total litres of pure alcohol). Note: NA value: grey. Litres: total litres of pure alcohol
+</figcaption>
+</div>
+
+From [Figure1](#Figure1), we could see that alcohol consumption in Europe and Australia is almost higher than 10. By contrast, alcohol consumption in Africa is close to zero. And the consumption in South America and North America is approximately 8, while it in Asia is around 5.
+
+## Global alcohol consumption of beer, spirit and wine
+
+<div>
+
+<a name = 'Table1'></a>
+
+```{r}
+
+alcohol_table <- tibble('alcohol servings' = c("beer servings",
+                                               "spirit servings",
+                                               "wine servings"),
+                        mean = c(round(mean(alcohol$beer_servings),2),
+                                 round(mean(alcohol$spirit_servings),2),
+                                 round(mean(alcohol$wine_servings),2)
+                                ),
+                        median = c(median(alcohol$beer_servings),
+                                   median(alcohol$spirit_servings),
+                                   median(alcohol$wine_servings)),
+                        sum = c(sum(alcohol$beer_servings),
+                                   sum(alcohol$spirit_servings),
+                                   sum(alcohol$wine_servings))
+                        )
+  
+ alcohol_table %>%
+   knitr::kable(caption = "Table1: Mean, median and sum of beer servings, spirit servings and wine servings") %>%
+   kable_styling()
+
+```
+
+</div>
+
+From [Table1](#Table1), one thing we need to note that is we cannot compare the consumption by alcohol servings without a unit. We could easily know that beer consumption in a country is normally around 106 and the total beer consumption is around 20 thousand, and the average spirit consumption is around 80 and the total spirit consumption is around 15 thousand, and the average wine consumption is approximately 50 and the total wine consumption is around 9 thousand. 
+
+### Global beer consumption
+
+```{r}
+
+p2<-ggplot(map_data, aes(x = long, y = lat, group = group, 
+                     text = sprintf("region: %s<br>beer servings: %s",
+                                    region, beer_servings)))+
+  geom_polygon( aes(fill = beer_servings), color = "white")+
+  scale_fill_gradient(low = "#fff7f3", 
+                        high = "#49006a",
+                      na.value = "grey",
+                      breaks = c(0,50,100,150,200,250,300,350,400),
+                      labels = c(0,50,100,150,200,250,300,350,400))+
+  theme_void()+
+  theme(panel.grid = element_blank(),
+        axis.line.x = element_blank(),
+        axis.line.y = element_blank())+
+  labs(fill = "Servings",
+       title = "Beer global alcohol consumption")
+```
+
+<div>
+
+<a name = 'Figure2'></a>
+
+```{r}
+ggplotly(p2, tooltip = "text")
+
+```
+<figcaption class= "figure-ggplot">
+Figure2: Global beer consumption. Note: NA value: grey. Servings: beer servings
+</figcaption>
+</div>
+
+See [Figure2](#Figure2), beer consumption in northern Africa is almost under 50, and the consumption in southwestern Africa is almost high, with most countries over 200, and even near 350. Beer servings in Europe, North America, South America and Australia are almost higher than 200, especially consumption in Europe, some countries exceed 300, while servings in Asia are all approximately under 100.
+
+### Global spirit consumption
+
+```{r}
+
+p3<- ggplot(map_data, aes(x = long, y = lat, group = group, 
+                     text = sprintf("region: %s<br>spirit servings: %s",
+                                    region, spirit_servings)))+
+  geom_polygon( aes(fill = spirit_servings), color = "white")+
+  scale_fill_gradient(low = "#fff7f3", 
+                        high = "#49006a",
+                      na.value = "grey" ,
+                      breaks = c(0,50,100,150,200,250,300,350,400),
+                      labels = c(0,50,100,150,200,250,300,350,400))+
+  theme_void()+
+  theme(panel.grid = element_blank(),
+        axis.line.x = element_blank(),
+        axis.line.y = element_blank())+
+  labs(fill = "Servings",
+       title = "Spirit global alcohol consumption",
+       caption = "NA value: grey;
+       Servings: spirit servings")
+```
+<div>
+
+<a name = 'Figure3'></a>
+```{r}
+
+ggplotly(p3, tooltip = "text")
+```
+<figcaption class= "figure-ggplot">
+Figure3: Global spirit consumption. Note: NA value: grey. Servings: spirit servings
+</figcaption>
+</div>
+
+In [Figure3](#Figure3), the consumption of spirit is highest in Eastern Europe, for example, Russian Federation and Belarus consume more than 300. And the consumption in Asia is around 200, in Africa, it is almost close to zero.
+
+### Global wine consumption
+
+```{r}
+
+p4 <- ggplot(map_data, aes(x = long, y = lat, group = group, 
+                     text = sprintf("region: %s<br>wine servings: %s",
+                                    region, wine_servings)))+
+ geom_polygon( aes(fill = wine_servings), color = "white")+
+  scale_fill_gradient(low = "#fff7f3", 
+                        high = "#49006a",
+                      na.value = "grey",
+                      breaks = c(0,50,100,150,200,250,300,350,400),
+                      labels = c(0,50,100,150,200,250,300,350,400))+
+  theme_void()+
+  theme(panel.grid = element_blank(),
+        axis.line.x = element_blank(),
+        axis.line.y = element_blank())+
+  labs(fill = "Servings",
+       title = "Wine global alcohol consumption",
+       caption = "NA value: grey;
+       Servings: wine servings")
+```
+
+<div>
+
+<a name = 'Figure4'></a>
+```{r}
+
+ggplotly(p4, tooltip = "text")
+```
+<figcaption class= "figure-ggplot">
+Figure4: Global wine consumption. Note: NA value: grey. Servings: wine servings
+</figcaption>
+</div>
+
+From [Figure4](#Figure4), it is easy to see that global wine consumption is not high, except in southern South America, Australia and western Europe, including Argentina, France and Australia, where the consumption is greater than 200.
+
+## Dataset
+
+*More data can be found here.*
+
+```{r}
+
+alcohol <- alcohol %>%
+  rename('beer servings' = beer_servings,
+         'spirit servings' = spirit_servings,
+         'wine servings' = wine_servings,
+         'total litres of pure alcohol' = total_litres_of_pure_alcohol)
+
+DT::datatable(alcohol, 
+              options = list(pageLength = 5), 
+              caption = "Alcohol consumption by country",
+              text_spec(alcohol, font_size = "small") 
+             
+             )
+```
+
+## Reference
+
+*Thomas Mock (2022). Tidy Tuesday: A weekly data project aimed at the R ecosystem <https://github.com/rfordatascience/tidytuesday>.*
+
+*Auguie, B (2017). gridExtra: Miscellaneous Functions for "Grid" Graphics. R package version 2.3. <https://CRAN.R-project.org/package=gridExtra>.*
+
+*Pedersen, TL (2020). patchwork: The Composer of Plots. R package version 1.1.1. <https://CRAN.R-project.org/package=patchwork>.*
+
+*R Core Team (2022). R: A Language and Environment for Statistical Computing. R Foundation for Statistical Computing. Vienna, Austria. <https://www.R-project.org/>.*
+
+*Sievert, C (2020). Interactive Web-Based Data Visualization with R, plotly, and shiny. Chapman and Hall/CRC. <https://plotly-r.com>.*
+
+*Wickham, H, M Averick, J Bryan, W Chang, LD McGowan, R François, G Grolemund, A Hayes, L Henry, J Hester, M Kuhn, TL Pedersen, E Miller, SM Bache, K Müller, J Ooms, D Robinson, DP Seidel, V Spinu, K Takahashi, D Vaughan, C Wilke, K Woo, and H Yutani (2019). Welcome to the tidyverse. Journal of Open Source Software 4(43), 1686.*
+
+*Xie, Y (2022). knitr: A General-Purpose Package for Dynamic Report Generation in R. R package version1.38. <https://yihui.org/knitr/>.*
+
+*Xie, Y, J Cheng, and X Tan (2022). DT: A Wrapper of the JavaScript Library 'DataTables'. R package version 0.24. <https://CRAN.R-project.org/package=DT>.*
+
+*Zhu, H (2021). kableExtra: Construct Complex Table with 'kable' and Pipe Syntax. R package version 1.3.4. <https://CRAN.R-project.org/package=kableExtra>.*
+
+*Wikipedia.(2022).Alcoholic drink. <https://en.wikipedia.org/wiki/Alcoholic_drink>.*
+
+*THE WORLD BANK.(2022).Total alcohol consumption per capita (liters of pure alcohol, projected estimates, 15+ years of age). <https://data.worldbank.org/indicator/SH.ALC.PCAP.LI>*

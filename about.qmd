@@ -1,0 +1,13 @@
+---
+title: "Di Cui"
+image: profile.jpg
+about:
+  template: jolla
+  links:
+    - icon: github
+      text: Github
+      href: https://github.com/DI-CUI
+
+---
+
+This blog shows Di Cui's learning results. 

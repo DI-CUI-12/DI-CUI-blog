@@ -1,0 +1,303 @@
+---
+title: "Nobel Prize laureates"
+author: "Di Cui"
+date: "2022-10-16"
+categories: [Nobel]
+image: "Nobel_img.webp"
+execute: 
+  echo: false
+  warning: false
+  message: false
+  error: false
+format: 
+  html:
+    toc: true
+    code-fold: true
+    css: 03-custom.css
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+nobel_winners <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-05-14/nobel_winners.csv")
+
+nobel_winner_all_pubs <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-05-14/nobel_winner_all_pubs.csv")
+```
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(plotly)
+library(patchwork)
+```
+
+## Introduction
+
+The recent announcement of the Nobel Prize winners, which runs from October 3, has attracted a lot of attention. 
+Nobel Prize is a set of annual international awards bestowed in several categories by Swedish and Norwegian institutions in recognition of academic, cultural, or scientific advances. Nobel Prizes are awarded in the fields of Physics, Chemistry, Physiology or Medicine, Literature, and Peace. This blog gives an overview of Nobel winners and Nobel laureate publications from 1901 to 2016.
+
+![](https://www.nobelprize.org/images/52993-landscape-full-width-2x.jpg)
+
+<div>
+<imgcaption class="img-caption">
+Image source: The Nobel Prize medal. Photo: Alexander Mahmoud 2018 
+</imgcaption>
+</div>
+
+## Data description
+
+There are two datasets used in the blog, one covers all of the Nobel prize winners records from 1901 to 2016 (i.e. name, birth date, prize year, category, gender and organization name), and the other one covers all the publication records for almost all Nobel laureates in physics, chemistry, and medicine from 1901 to 2016 (i.e. title, publication year and category).
+
+The data source is from Thomas Mock (2022). Tidy Tuesday: A weekly data project aimed at the R ecosystem <https://github.com/rfordatascience/tidytuesday>.
+
+Click [here](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-05-14) to see or download the data.
+
+## Nobel winners
+
+### Count of Nober winners
+
+Between 1901 and 2016, the Nobel Prizes were awarded to `r nrow(nobel_winners %>% distinct(full_name))-1` people and organisations: `r nrow(nobel_winners %>% filter(laureate_type == "Individual") %>% distinct(full_name))` individuals and `r nrow(nobel_winners %>% filter(laureate_type == "Organization")%>% distinct(full_name))-1` organisations. Below, you can view the count of Nobel Prizes winners over year.
+
+```{r}
+# trend of nobel winners over year
+winner_trend <- nobel_winners %>%
+  group_by(prize_year) %>%
+  count() %>%
+  ggplot(aes(x = prize_year, y = n))+
+    geom_line(size = 0.75, color = "#ef6548")+
+    geom_point(color = "#fed976")+
+    ggtitle("Count of nobel winners over year")+
+    scale_y_log10()+
+    xlab("Prize year")+
+    ylab("Number")+
+    scale_x_continuous(breaks = seq(1901,2016,5), limits = c(1901,2016))+
+    theme_bw()+
+    theme(text = element_text(size = 15))+
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+<div>
+
+<a name = 'Figure1'></a>
+
+```{r}
+#| fig-align: center
+ggplotly(winner_trend)
+```
+
+<figcaption class="figure-ggplot">
+
+Figure1: Count of Nobel winners over year from 1901 to 2016.
+
+</figcaption>
+
+</div>
+
+See [Figure1](#Figure1). Since 1901, there have been Nobel Prize winners almost every year, and the number of winners has been rising, although the rise has been accompanied by ups and downs. It is worth noting that the number of laureates declined during World War I (1914-1918) and World War II (1939-1945), especially the precipitous decline during World War I and the absence of laureates between 1939 and 1943. It may be because of the economic downturn caused by the war and the deficit of the Nobel Prize.
+
+### Gender of Nobel winners
+
+Between 1901 and 2016, the Nobel Prizes were awarded to `r nrow(nobel_winners %>% filter(gender == "Female")%>% distinct(full_name))` females and `r nrow(nobel_winners %>% filter(gender == "Male")%>% distinct(full_name))` males. Below, you can view the count of Nobel Prizes winners over year by gender.
+
+```{r}
+# Count of Nobel winners over year by gender
+
+gender_trend <- nobel_winners %>%
+  group_by(prize_year, gender) %>%
+  filter(!is.na(gender)) %>%
+  count() %>%
+  ggplot(aes(x = prize_year, y = n))+
+    geom_line(size = 0.75, aes(color = gender))+
+    geom_point(aes(color = gender))+
+    facet_wrap(~ gender, scales = "free_y", ncol = 1)+
+    scale_y_log10()+
+    xlab("Prize year")+
+    ylab("Number")+
+    scale_x_continuous(breaks = seq(1901,2016,5), limits = c(1901,2016))+
+    theme_bw()+
+    theme(text = element_text(size = 15))+
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+    theme(legend.position = "none")+
+    ggtitle("Count of Nobel winners over year by gender")
+
+```
+
+<div>
+
+<a name = 'Figure2'></a>
+
+```{r}
+#| fig-align: center
+
+gender_trend
+```
+
+<figcaption class="figure-ggplot">
+
+Figure2: Count of Nobel winners over year by gender from 1901 to 2016.
+
+</figcaption>
+
+</div>
+
+See [Figure2](#Figure2). The number of female Nobel Prize winners is far less than that of male, it was 0 or 1 until 1976, when the number of female Nobel Prize winners exceeded 1, and then the number of female winners has shown rapid growth, especially in 2009, when 6 were achieved. The status of women in the Nobel Prize world is changing. As education becomes more widespread，it is expected that as women around the world become more educated, they will achieve more in the Nobel Prize.
+
+### Nobel winners' prize age
+
+```{r}
+age <- nobel_winners %>%
+  filter(!is.na(birth_date)) %>%
+  mutate(birth_year = year(birth_date),
+         age = prize_year - birth_year) %>%
+  group_by(age) %>%
+  count() %>%
+  arrange(age)
+```
+
+Between 1901 and 2016, the youngest laureate is `r age$age[1]`, and the oldest laureate is `r age$age[62]`. Below, you can view the age distribution of Nobel laureates at the time of the award.
+
+```{r}
+# Nobel winners'prize age
+  
+age_trend <- age %>%
+  ggplot(aes(x = age, y = n))+
+     geom_line(size = 0.75, color = "#41ae76")+
+     geom_point(color = "#ef6548")+
+     scale_x_continuous(breaks = seq(10,100,10), limits = c(10,100))+
+     scale_y_continuous(breaks = seq(1,36,5), limits = c(0,36))+
+    theme_bw()+
+    theme(text = element_text(size = 15))+
+    ggtitle("Nobel winners' prize age")+
+    xlab("Age")+
+    ylab("Number")
+
+avg_age <- nobel_winners %>%
+  filter(!is.na(birth_date)) %>%
+  mutate(birth_year = year(birth_date),
+         age = prize_year - birth_year) %>%
+  group_by(age, prize_year)  %>%
+select(age, prize_year)
+
+mean_age <- avg_age %>%
+	group_by(prize_year) %>%
+  summarise(mean_age = mean(age)) 
+
+avg_age_trend <-  ggplot(mean_age, aes(x = prize_year, y = mean_age))+
+                  geom_line(size = 0.75, color = "#fc8d59")+
+                  geom_point(color = "#ef6548")+
+                  geom_hline(yintercept = 60, size = 0.75)+
+                  geom_text(aes(x = 1998, y = 56),label = ("age = 60"), size = 5)+
+                  ggtitle("Nobel winners' average prize age over year")+
+                  scale_y_log10()+
+                  xlab("Prize year")+
+                  ylab("Average age")+
+                  scale_x_continuous(breaks = seq(1901,2016,5), limits = c(1901,2016))+
+                  theme_bw()+
+                  theme(text = element_text(size = 15))+
+                  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+<div>
+
+<a name = 'Figure3'></a>
+
+```{r}
+#| fig-align: center
+
+age_trend / avg_age_trend
+```
+
+<figcaption class="figure-ggplot">
+
+Figure3: Age distribution of Nobel laureates at the time of the award.
+
+</figcaption>
+
+</div>
+
+See [Figure3](#Figure3). Awards at the age of 17 and 90 are rare, the majority of Nobel laureates were between 50 and 70 years old at the time of their award. 
+
+Probably because of the war, during World War I (1914-1918) and World War II (1939-1945), the average age at the time of the award was lower than in other years. The red line represents the age of 60. Before 1966, the average age of most of the annual winners was under 60 at the time of the award, and after 1966, most of the average age were over 60 years old when they won the prize, which may be the reason for the increase in the number of winners and their longevity.
+
+## Nobel laureate publications
+
+A person or organisation awarded the Nobel Prize is called Nobel Prize laureate.
+
+```{r}
+# Count of Nobel Laureate Publications over year
+
+# pub_trend <- nobel_winner_all_pubs %>%
+#   group_by(pub_year) %>%
+#   count() %>%
+#   ggplot(aes(x = pub_year, y = n))+
+#     geom_line(size = 0.75)+
+#     ggtitle("Count of Nobel Laureate Publications over year")+
+#     xlab("Prize year")+
+#     ylab("Number")+
+#     scale_x_continuous(breaks = seq(1901,2016,5), limits = c(1901,2016))+
+#     theme_bw()+
+#     theme(text = element_text(size = 12))+
+#     theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+```{r}
+# Count of Nobel Laureate Publications over year by category
+pub_cate_trend <- nobel_winner_all_pubs %>%
+  group_by(pub_year, category) %>%
+  count() %>%
+  ggplot(aes(x = pub_year, y = n, color = category))+
+    geom_line(size = 0.5)+
+    geom_point(size = 0.55)+
+    ggtitle("Count of Nobel Laureate Publications over year by category")+
+    xlab("Prize year")+
+    ylab("Number")+
+    scale_x_continuous(breaks = seq(1901,2016,5), limits = c(1901,2016))+
+    theme_bw()+
+    theme(text = element_text(size = 15))+
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+<div>
+
+<a name = 'Figure4'></a>
+
+```{r}
+#| fig-align: center
+ggplotly(pub_cate_trend)
+```
+
+<figcaption class="figure-ggplot">
+
+Figure4: Count of Nobel Laureate Publications over year by category from 1901 to 2016.
+
+</figcaption>
+
+</div>
+
+See [Figure4](#Figure4). The overall trend in the development of the three categories of publications was similar, declining during World War II (1939-1945) and then slowly pulling away from each other, with chemistry taking first place, medicine second, and physics third. Around 1996, the number of publications in these three categories declined, but surprisingly, the number of publications in chemistry reached about 1500 in 2010, almost three times as many as in medicine and five times as many as in physics.
+
+## Conclusion
+
+Since 1901, the Nobel Prize has become increasingly important in the world and has become a highly influential academic prize in the world.
+
+With the rapid development of science and technology as well as the popularity of education, more and more people are winning the Nobel Prize, as well as the winners also publish more and more publications, the results of the Nobel Prize and the publications of the winners help the world to progress. We expect more and more people to go further and further on the path of science, technology and literature in the future.
+
+
+
+## Reference
+
+*Thomas Mock (2022). Tidy Tuesday: A weekly data project aimed at the R ecosystem <https://github.com/rfordatascience/tidytuesday>.*
+
+*Pedersen, TL (2020). patchwork: The Composer of Plots. R package version 1.1.1. <https://CRAN.R-project.org/package=patchwork>.*
+
+*Sievert, C (2020). Interactive Web-Based Data Visualization with R, plotly, and shiny. Chapman and Hall/CRC. <https://plotly-r.com>.*
+
+*Grolemund, G and H Wickham (2011). Dates and Times Made Easy with lubridate. Journal of Statistical Software 40(3), 1–25.*
+
+*Wickham, H, M Averick, J Bryan, W Chang, LD McGowan, R François, G Grolemund, A Hayes, L Henry, J Hester, M Kuhn, TL Pedersen, E Miller, SM Bache, K Müller, J Ooms, D Robinson, DP Seidel, V Spinu, K Takahashi, D Vaughan, C Wilke, K Woo, and H Yutani (2019). Welcome to the tidyverse. Journal of Open Source Software 4(43), 1686.*
+
+*THE NOBEL PRIZE.(2022).NOBEL PRIZES AND LAUREATES <https://www.nobelprize.org/>.*

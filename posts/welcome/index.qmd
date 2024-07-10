@@ -1,0 +1,10 @@
+---
+title: "Welcome To My Blog"
+author: "Di Cui"
+date: "2022-08-28"
+categories: [news]
+---
+
+This is the first post in a Quarto blog. Welcome!
+
+![](flower.jpg)
